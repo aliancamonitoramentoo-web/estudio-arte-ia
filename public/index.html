@@ -150,6 +150,9 @@
     .ia-sugestao-title{font-size:11px;font-weight:700;color:var(--pl);display:flex;align-items:center;gap:5px;margin-bottom:.5rem}
     .ia-sugestao p{font-size:12px;color:var(--t2);line-height:1.5}
 
+    /* VÍDEO DE FUNDO */
+    .editor-preview-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+
     /* LOGO PREVIEW */
     .logo-box{border:1.5px dashed var(--border2);border-radius:var(--rs);padding:1rem;text-align:center;margin-top:.5rem;position:relative;min-height:80px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;background:var(--bg3);transition:border-color .15s}
     .logo-box:hover{border-color:var(--purple)}
@@ -330,6 +333,32 @@
 
     <!-- PAINEL -->
     <div class="editor-panel">
+      <!-- VÍDEO DE FUNDO -->
+      <div class="panel-section" id="video-section">
+        <div class="panel-title"><i class="ti ti-video"></i> Vídeo de fundo <span class="ia-tag"><i class="ti ti-upload"></i> seu vídeo</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.75rem">
+          <button class="src-btn active" id="ed-modo-foto" onclick="edSetModo('foto')"><i class="ti ti-photo"></i> Foto</button>
+          <button class="src-btn" id="ed-modo-video" onclick="edSetModo('video')"><i class="ti ti-video"></i> Vídeo</button>
+        </div>
+        <div id="video-upload-area" style="display:none">
+          <label style="display:block;border:1.5px dashed var(--border2);border-radius:var(--rs);padding:1rem;text-align:center;cursor:pointer;background:var(--bg3);transition:border-color .15s" id="video-drop-label">
+            <i class="ti ti-video-plus" style="font-size:24px;color:var(--pl);display:block;margin-bottom:6px"></i>
+            <span style="font-size:12px;font-weight:600;color:var(--t2)">Clique ou arraste seu vídeo</span>
+            <span style="font-size:11px;color:var(--t3);display:block;margin-top:3px">MP4, MOV, WebM · máx 100MB</span>
+            <input type="file" id="video-input" accept="video/mp4,video/mov,video/webm,video/quicktime" style="display:none" onchange="videoUpload(this)"/>
+          </label>
+          <div id="video-status" style="display:none;margin-top:8px;padding:8px 10px;border-radius:var(--rs);background:var(--pd);border:1px solid rgba(127,119,221,.2)">
+            <div style="font-size:12px;color:var(--pl);display:flex;align-items:center;gap:6px" id="video-status-msg"><i class="ti ti-check"></i> Vídeo carregado!</div>
+            <video id="video-preview-thumb" style="width:100%;border-radius:6px;margin-top:6px;max-height:80px;object-fit:cover" muted playsinline></video>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px">
+              <button class="btn-sm" onclick="videoExportWebM()" style="font-size:11px;justify-content:center"><i class="ti ti-download"></i> Baixar WebM</button>
+              <button class="btn-sm" onclick="videoExportGIF()" style="font-size:11px;justify-content:center"><i class="ti ti-download"></i> Baixar GIF</button>
+            </div>
+            <div style="font-size:10px;color:var(--t3);margin-top:4px;text-align:center">WebM = vídeo · GIF = compatível com tudo</div>
+          </div>
+        </div>
+      </div>
+
       <!-- FOTOS ALTERNATIVAS -->
       <div class="panel-section">
         <div class="panel-title"><i class="ti ti-photo-search"></i> Foto de fundo <span class="ia-tag"><i class="ti ti-sparkles"></i> IA sugeriu</span></div>
@@ -395,16 +424,19 @@ const state = {
   editorFoto: null,
   editorSvg: '',
   editorSource: 'unsplash',
+  videoUrl: null,      // URL do vídeo carregado pelo usuário
+  videoEl: null,       // elemento <video> em memória
+  modoFundo: 'foto',   // 'foto' | 'video'
 };
 
-// Configs dos 6 templates
 const TEMPLATES = [
-  { id:'feed',     label:'Post Feed',      sub:'Instagram · 1:1',     icon:'ti-brand-instagram', badge:'FEED',    badgeColor:'#7F77DD', viewBox:'0 0 500 500', orientacao:'squarish', tipo:'post feed quadrado' },
-  { id:'story',    label:'Story',          sub:'Instagram · 9:16',    icon:'ti-device-mobile',   badge:'STORY',   badgeColor:'#D85A30', viewBox:'0 0 300 530', orientacao:'portrait',  tipo:'story vertical redes sociais' },
-  { id:'banner',   label:'Banner',         sub:'LinkedIn · Facebook',  icon:'ti-layout-navbar',   badge:'BANNER',  badgeColor:'#1D9E75', viewBox:'0 0 600 314', orientacao:'landscape', tipo:'banner horizontal profissional' },
-  { id:'logo',     label:'Logo + Cenário', sub:'Mockup realista',      icon:'ti-building',        badge:'MOCKUP',  badgeColor:'#BA7517', viewBox:'0 0 500 300', orientacao:'landscape', tipo:'logo identidade visual aplicado em cenário real' },
-  { id:'cartao',   label:'Cartão de Visita',sub:'Frente · 85×54mm',   icon:'ti-id-badge',        badge:'CARTÃO',  badgeColor:'#D4537E', viewBox:'0 0 500 300', orientacao:'landscape', tipo:'cartão de visita profissional' },
-  { id:'promo',    label:'Promoção',       sub:'Oferta especial',      icon:'ti-tag',             badge:'PROMO',   badgeColor:'#378ADD', viewBox:'0 0 500 500', orientacao:'squarish', tipo:'post promoção oferta especial' },
+  { id:'feed',     label:'Post Feed',        sub:'Instagram · 1:1',      icon:'ti-brand-instagram', badge:'FEED',    badgeColor:'#7F77DD', viewBox:'0 0 500 500', orientacao:'squarish',  tipo:'post feed quadrado' },
+  { id:'story',    label:'Story',            sub:'Instagram · 9:16',     icon:'ti-device-mobile',   badge:'STORY',   badgeColor:'#D85A30', viewBox:'0 0 300 530', orientacao:'portrait',   tipo:'story vertical redes sociais' },
+  { id:'storyvid', label:'Story com Vídeo',  sub:'Vídeo seu + arte IA',  icon:'ti-video',           badge:'VIDEO',   badgeColor:'#c4461e', viewBox:'0 0 300 530', orientacao:'portrait',   tipo:'story vertical animado sobre vídeo real' },
+  { id:'banner',   label:'Banner',           sub:'LinkedIn · Facebook',  icon:'ti-layout-navbar',   badge:'BANNER',  badgeColor:'#1D9E75', viewBox:'0 0 600 314', orientacao:'landscape',  tipo:'banner horizontal profissional' },
+  { id:'logo',     label:'Logo + Cenário',   sub:'Mockup realista',      icon:'ti-building',        badge:'MOCKUP',  badgeColor:'#BA7517', viewBox:'0 0 500 300', orientacao:'landscape',  tipo:'logo identidade visual aplicado em cenário real' },
+  { id:'cartao',   label:'Cartão de Visita', sub:'Frente · 85×54mm',    icon:'ti-id-badge',        badge:'CARTÃO',  badgeColor:'#D4537E', viewBox:'0 0 500 300', orientacao:'landscape',  tipo:'cartão de visita profissional' },
+  { id:'promo',    label:'Promoção',         sub:'Oferta especial',      icon:'ti-tag',             badge:'PROMO',   badgeColor:'#378ADD', viewBox:'0 0 500 500', orientacao:'squarish',   tipo:'post promoção oferta especial' },
 ];
 
 // Queries Unsplash por setor
@@ -921,7 +953,229 @@ async function edExportPNG() {
       renderPNG();
     }
   } catch(e) { console.error(e); alert('Erro ao exportar. Use o SVG.'); }
+}// ══════════════════════════════════════════
+// VÍDEO DE FUNDO
+// ══════════════════════════════════════════
+function edSetModo(modo) {
+  state.modoFundo = modo;
+  document.getElementById('ed-modo-foto').classList.toggle('active', modo === 'foto');
+  document.getElementById('ed-modo-video').classList.toggle('active', modo === 'video');
+  document.getElementById('video-upload-area').style.display = modo === 'video' ? 'block' : 'none';
+
+  const inner = document.getElementById('ed-preview-inner');
+  const existingVideo = inner.querySelector('.editor-preview-video');
+
+  if (modo === 'video' && state.videoEl) {
+    // Mostra o vídeo existente
+    if (!existingVideo) {
+      inner.insertBefore(state.videoEl, inner.firstChild);
+    }
+    document.getElementById('ed-bg').style.backgroundImage = 'none';
+  } else if (modo === 'foto') {
+    if (existingVideo) existingVideo.remove();
+    if (state.editorFoto) {
+      document.getElementById('ed-bg').style.backgroundImage = `url(${state.editorFoto.url || state.editorFoto.thumb})`;
+    }
+  }
+}
+
+function videoUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const statusEl = document.getElementById('video-status');
+  const msgEl = document.getElementById('video-status-msg');
+  statusEl.style.display = 'block';
+  msgEl.innerHTML = '<i class="ti ti-loader"></i> Carregando vídeo...';
+
+  const url = URL.createObjectURL(file);
+  state.videoUrl = url;
+
+  // Cria elemento de vídeo
+  const vid = document.createElement('video');
+  vid.className = 'editor-preview-video';
+  vid.src = url;
+  vid.autoplay = true;
+  vid.loop = true;
+  vid.muted = true;
+  vid.playsInline = true;
+  vid.style.zIndex = '0';
+  state.videoEl = vid;
+
+  // Thumb no painel
+  const thumb = document.getElementById('video-preview-thumb');
+  thumb.src = url;
+  thumb.play().catch(() => {});
+
+  vid.onloadeddata = () => {
+    msgEl.innerHTML = `<i class="ti ti-check"></i> ${file.name} · ${Math.round(file.size/1024/1024*10)/10}MB`;
+    // Ativa modo vídeo automaticamente
+    edSetModo('video');
+  };
+
+  vid.onerror = () => {
+    msgEl.innerHTML = '<i class="ti ti-alert-circle"></i> Erro ao carregar vídeo';
+  };
+
+  // Drag & drop visual
+  const label = document.getElementById('video-drop-label');
+  label.style.borderColor = 'var(--purple)';
+  label.style.background = 'var(--pd)';
+}
+
+// Drag & drop no label
+document.addEventListener('DOMContentLoaded', () => {
+  const label = document.getElementById('video-drop-label');
+  if (!label) return;
+  label.addEventListener('dragover', e => { e.preventDefault(); label.style.borderColor = 'var(--purple)'; });
+  label.addEventListener('dragleave', () => { label.style.borderColor = 'var(--border2)'; });
+  label.addEventListener('drop', e => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('video/')) {
+      const input = document.getElementById('video-input');
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      input.files = dt.files;
+      videoUpload(input);
+    }
+  });
+});
+
+// ── EXPORTAR WEBM (vídeo + arte SVG sobreposta) ──
+async function videoExportWebM() {
+  if (!state.videoEl || !state.editorSvg) {
+    alert('Precisa de um vídeo e de uma arte gerada.'); return;
+  }
+
+  const tpl = TEMPLATES[state.editorIdx];
+  const vbParts = tpl.viewBox.split(' ');
+  const W = parseInt(vbParts[2]);
+  const H = parseInt(vbParts[3]);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // Carrega SVG como imagem
+  const svgBlob = new Blob([state.editorSvg], { type: 'image/svg+xml' });
+  const svgUrl = URL.createObjectURL(svgBlob);
+  const svgImg = new Image();
+
+  svgImg.onload = () => {
+    const stream = canvas.captureStream(30);
+    const recorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9' });
+    const chunks = [];
+    recorder.ondataavailable = e => chunks.push(e.data);
+    recorder.onstop = () => {
+      const blob = new Blob(chunks, { type: 'video/webm' });
+      const a = document.createElement('a');
+      const nome = (state.empresa.nome || 'story').toLowerCase().replace(/\s+/g,'-');
+      a.download = `${nome}-story.webm`;
+      a.href = URL.createObjectURL(blob);
+      a.click();
+    };
+
+    const opacity = parseInt(document.getElementById('ed-overlay-opacity').value) / 100;
+    const vid = state.videoEl;
+    vid.currentTime = 0;
+    vid.play();
+
+    recorder.start();
+
+    const duration = Math.min(vid.duration || 6, 15) * 1000; // máx 15s
+    const startTime = Date.now();
+
+    function renderFrame() {
+      if (Date.now() - startTime >= duration) {
+        recorder.stop();
+        URL.revokeObjectURL(svgUrl);
+        return;
+      }
+      // Desenha frame do vídeo
+      ctx.drawImage(vid, 0, 0, W, H);
+      // Overlay escuro
+      ctx.fillStyle = `rgba(0,0,0,${opacity})`;
+      ctx.fillRect(0, 0, W, H);
+      // SVG por cima
+      ctx.drawImage(svgImg, 0, 0, W, H);
+      requestAnimationFrame(renderFrame);
+    }
+    renderFrame();
+
+    setTimeout(() => { if (recorder.state === 'recording') recorder.stop(); }, duration + 500);
+  };
+  svgImg.src = svgUrl;
+}
+
+// ── EXPORTAR GIF (usando canvas frame a frame) ──
+async function videoExportGIF() {
+  if (!state.videoEl || !state.editorSvg) {
+    alert('Precisa de um vídeo e de uma arte gerada.'); return;
+  }
+
+  const tpl = TEMPLATES[state.editorIdx];
+  const vbParts = tpl.viewBox.split(' ');
+  const W = Math.min(parseInt(vbParts[2]), 400);
+  const H = Math.min(parseInt(vbParts[3]), 700);
+
+  // Usa gif.js via CDN
+  const script = document.createElement('script');
+  script.src = 'https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js';
+  document.head.appendChild(script);
+
+  script.onload = async () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d');
+
+    const svgBlob = new Blob([state.editorSvg], { type: 'image/svg+xml' });
+    const svgUrl = URL.createObjectURL(svgBlob);
+    const svgImg = new Image();
+
+    svgImg.onload = () => {
+      const gif = new GIF({ workers: 2, quality: 8, width: W, height: H, workerScript: 'https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js' });
+      const opacity = parseInt(document.getElementById('ed-overlay-opacity').value) / 100;
+      const vid = state.videoEl;
+      const fps = 10;
+      const totalFrames = fps * 4; // 4 segundos de GIF
+
+      vid.currentTime = 0;
+      let frame = 0;
+
+      const captureFrame = () => {
+        if (frame >= totalFrames) {
+          gif.render();
+          return;
+        }
+        vid.currentTime = (frame / fps) % (vid.duration || 4);
+        setTimeout(() => {
+          ctx.drawImage(vid, 0, 0, W, H);
+          ctx.fillStyle = `rgba(0,0,0,${opacity})`;
+          ctx.fillRect(0, 0, W, H);
+          ctx.drawImage(svgImg, 0, 0, W, H);
+          gif.addFrame(ctx, { copy: true, delay: 1000 / fps });
+          frame++;
+          captureFrame();
+        }, 80);
+      };
+
+      gif.on('finished', blob => {
+        const a = document.createElement('a');
+        const nome = (state.empresa.nome || 'story').toLowerCase().replace(/\s+/g,'-');
+        a.download = `${nome}-story.gif`;
+        a.href = URL.createObjectURL(blob);
+        a.click();
+        URL.revokeObjectURL(svgUrl);
+      });
+
+      captureFrame();
+    };
+    svgImg.src = svgUrl;
+  };
+
+  script.onerror = () => {
+    alert('Erro ao carregar biblioteca de GIF. Tente o WebM.');
+  };
 }
 </script>
-</body>
-</html>
