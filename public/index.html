@@ -619,7 +619,10 @@ async function gerarGaleria() {
   document.getElementById('gal-sub').textContent = `${state.empresa.setor} · ${state.empresa.cidade || 'Brasil'} · Clique para editar e baixar`;
 
   renderTemplatesGrid();
-  await Promise.all(TEMPLATES.map((tpl, i) => gerarTemplate(i)));
+  for (let i = 0; i < TEMPLATES.length; i++) {
+    await gerarTemplate(i);
+    if (i < TEMPLATES.length - 1) await new Promise(r => setTimeout(r, 1000));
+  }
 
   document.getElementById('btn-gerar').disabled = false;
   document.getElementById('btn-gerar').innerHTML = '<i class="ti ti-wand"></i> Gerar 6 artes com IA';
@@ -708,48 +711,27 @@ async function gerarTemplate(i) {
 }
 
 function buildPrompt(tpl, emp) {
-  const logoInstrucao = emp.logoUrl
-    ? `LOGO REAL DA EMPRESA: A logo está disponível como imagem externa. Use uma tag <image> no SVG para incorporá-la:
-<image href="${emp.logoUrl.startsWith('data:') ? emp.logoUrl.substring(0, 50) + '...(base64)' : emp.logoUrl}" x="..." y="..." width="..." height="..." preserveAspectRatio="xMidYMid meet"/>
-Posicione a logo de forma proeminente na composição. Use a logo REAL em vez de criar um símbolo genérico.
-A URL real para usar é: ${emp.logoUrl.startsWith('data:') ? emp.logoUrl : emp.logoUrl}`
-    : `Crie um símbolo/ícone representativo do setor ${emp.setor} usando apenas formas SVG (círculos, retângulos, paths simples). Não use imagens externas.`;
+  const logo = emp.logoUrl
+    ? `Logo real: <image href="${emp.logoUrl}" x="10%" y="5%" width="30%" preserveAspectRatio="xMidYMid meet"/>`
+    : `Ícone SVG do setor ${emp.setor}.`;
 
-  const base = `Você é um designer gráfico sênior especializado em identidade visual brasileira de alto nível.
-Crie um SVG profissional para a empresa "${emp.nome}" (setor: ${emp.setor}${emp.cidade ? ', ' + emp.cidade : ''}).
-${emp.slogan ? 'Slogan: ' + emp.slogan + '.' : ''}
-${emp.contato ? 'Contato/CTA: ' + emp.contato + '.' : ''}
-Estilo visual: ${emp.estilos}. Cor principal: ${emp.cor}.
-Tipo de arte: ${tpl.tipo}.
-viewBox EXATAMENTE "${tpl.viewBox}".
-${logoInstrucao}`;
-
-  const instrucoes = {
-    feed: `Layout quadrado para feed Instagram. Composição centralizada, hierarquia visual clara: logo/nome em destaque, slogan secundário, CTA no rodapé. Fundo com gradiente ou padrão geométrico que contraste com foto de fundo real. Elementos decorativos modernos.`,
-    story: `Layout vertical story Instagram. Composição em 3 zonas: topo (logo/nome), meio (mensagem principal + visual impactante), rodapé (CTA + contato). Use o espaço vertical com criatividade. Tipografia grande e legível em tela de celular.`,
-    banner: `Banner horizontal profissional. Lado esquerdo: logo + nome + slogan. Lado direito: elemento visual decorativo do setor. Faixa de CTA no rodapé. Proporção cinematográfica, aspecto profissional.`,
-    logo: `Logo aplicado em cenário real (mockup). Crie uma composição onde o logo da empresa aparece sobre um fundo escurecido, como se estivesse em uma fachada, placa ou superfície real. Logo centralizado, nome em destaque, elementos do setor ao redor.`,
-    cartao: `Cartão de visita profissional. Frente do cartão: logo + nome da empresa em destaque, setor/cargo. Rodapé: contato, site, redes sociais. Design elegante, uso inteligente de cor e espaço em branco.`,
-    promo: `Post de promoção/oferta especial. Texto "OFERTA ESPECIAL" ou similar em destaque. Nome da empresa. Elementos visuais que transmitem urgência e valor (estrelas, destaques, selos). CTA forte no rodapé. Cores vibrantes e chamativas.`,
+  const inst = {
+    feed:    'Feed quadrado Instagram. Nome/logo centralizados, slogan, CTA no rodapé. Fundo semi-transparente escuro.',
+    story:   'Story 9:16. Topo: logo+nome. Meio: slogan grande. Rodapé: CTA. Fundo semi-transparente.',
+    storyvid:'Story sobre vídeo. Fundo overlay escuro sutil. Logo topo, slogan meio, CTA rodapé.',
+    banner:  'Banner horizontal. Esquerda: logo+nome+slogan. Direita: elemento decorativo. Fundo escuro.',
+    logo:    'Logo profissional centralizada. Fundo escuro semi-transparente. Nome em destaque.',
+    cartao:  'Cartão de visita. Fundo sólido elegante. Nome, contato. Design limpo.',
+    promo:   'Post promoção. OFERTA ESPECIAL em destaque. Nome empresa. CTA forte. Fundo sólido vibrante.',
   };
 
-  return `${base}
-
-DIRETRIZES DE DESIGN PROFISSIONAL:
-${instrucoes[tpl.id]}
-
-REGRAS TÉCNICAS OBRIGATÓRIAS:
-- viewBox="${tpl.viewBox}" — use EXATAMENTE este valor
-- ${tpl.id === 'logo' || tpl.id === 'banner' || tpl.id === 'feed' || tpl.id === 'story' ? 'Fundo semi-transparente escuro (rect com fill="rgba(0,0,0,0.5)" ou gradiente escuro) pois haverá foto de fundo real' : 'Fundo sólido com cor/gradiente profissional — não use transparente'}
-- Nome da empresa sempre visível, legível, em fonte sem serifa limpa
-- Use <text> com fontes: Arial, Helvetica, sans-serif
-- Ícone/símbolo representativo do setor ${emp.setor}
-- Hierarquia visual clara: título > subtítulo > detalhe
-- Contraste alto entre texto e fundo
-- Qualidade profissional — como se fosse feito por um designer humano sênior
-
-Retorne APENAS o código SVG completo, sem markdown, sem explicações.
-Depois do SVG escreva "===DESC===" e 2 frases sobre as escolhas criativas em português.`;
+  return `SVG profissional para "${emp.nome}" (${emp.setor}${emp.cidade?', '+emp.cidade:''}).
+${emp.slogan?'Slogan: '+emp.slogan+'.':''} ${emp.contato?'Contato: '+emp.contato+'.':''}
+Estilo: ${emp.estilos}. Cor: ${emp.cor}. viewBox="${tpl.viewBox}".
+${logo}
+${inst[tpl.id]||inst.feed}
+Regras: viewBox exato "${tpl.viewBox}", nome legível, fonte Arial, contraste alto.
+Retorne APENAS o SVG. Depois "===DESC===" e 1 frase criativa.`;
 }
 
 async function regerarTemplate(i) {
@@ -764,7 +746,10 @@ async function regerarTemplate(i) {
 
 async function regerarTodos() {
   renderTemplatesGrid();
-  await Promise.all(TEMPLATES.map((_, i) => gerarTemplate(i)));
+  for (let i = 0; i < TEMPLATES.length; i++) {
+    await gerarTemplate(i);
+    if (i < TEMPLATES.length - 1) await new Promise(r => setTimeout(r, 1000));
+  }
 }
 
 // ══════════════════════════════════════════
