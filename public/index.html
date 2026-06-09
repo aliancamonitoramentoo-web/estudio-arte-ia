@@ -150,6 +150,17 @@
     .ia-sugestao-title{font-size:11px;font-weight:700;color:var(--pl);display:flex;align-items:center;gap:5px;margin-bottom:.5rem}
     .ia-sugestao p{font-size:12px;color:var(--t2);line-height:1.5}
 
+    /* LOGO PREVIEW */
+    .logo-box{border:1.5px dashed var(--border2);border-radius:var(--rs);padding:1rem;text-align:center;margin-top:.5rem;position:relative;min-height:80px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;background:var(--bg3);transition:border-color .15s}
+    .logo-box:hover{border-color:var(--purple)}
+    .logo-preview-img{max-height:60px;max-width:140px;object-fit:contain;border-radius:6px}
+    .logo-status{font-size:12px;color:var(--t2);display:flex;align-items:center;gap:6px}
+    .logo-status.ok{color:var(--teal)}
+    .logo-status.err{color:#E24B4A}
+    .logo-status.loading{color:var(--pl)}
+    .logo-upload-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:20px;border:1px solid var(--border2);background:var(--pd);color:var(--pl);font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;transition:all .12s}
+    .logo-upload-btn:hover{background:rgba(127,119,221,.2)}
+
     @media(max-width:600px){
       .editor-wrap{grid-template-columns:1fr}
       .editor-panel{max-height:none}
@@ -211,6 +222,20 @@
     <div class="fg">
       <div class="flabel"><i class="ti ti-phone"></i> Contato / CTA</div>
       <input type="text" id="i-contato" placeholder="Ex: (82) 99999-9999 · @aliancamonitoramento · site.com.br"/>
+    </div>
+    <div class="fg">
+      <div class="flabel"><i class="ti ti-world"></i> Site da empresa <span style="font-weight:400;text-transform:none;letter-spacing:0;margin-left:4px">(para buscar logo automaticamente)</span></div>
+      <div style="display:flex;gap:8px">
+        <input type="text" id="i-dominio" placeholder="Ex: aliancamonitoramento.com.br, intelbras.com.br..." style="flex:1"/>
+        <button onclick="buscarLogoAuto()" style="padding:10px 14px;border-radius:var(--rs);border:1px solid var(--border2);background:var(--pd);color:var(--pl);cursor:pointer;font-size:13px;white-space:nowrap;font-family:Inter,sans-serif;display:flex;align-items:center;gap:5px"><i class="ti ti-search"></i> Buscar logo</button>
+      </div>
+      <div class="logo-box" id="logo-box">
+        <div class="logo-status" id="logo-status"><i class="ti ti-photo"></i> A IA buscará a logo automaticamente pelo site, ou faça upload</div>
+        <label class="logo-upload-btn">
+          <i class="ti ti-upload"></i> Upload manual
+          <input type="file" id="logo-upload" accept="image/png,image/svg+xml,image/jpeg,image/webp" style="display:none" onchange="logoUpload(this)"/>
+        </label>
+      </div>
     </div>
   </div>
 
@@ -422,6 +447,91 @@ function extractDesc(text) {
 }
 
 // ══════════════════════════════════════════
+// LOGO DA EMPRESA
+// ══════════════════════════════════════════
+let logoDataUrl = null; // base64 da logo para usar nos prompts
+
+async function buscarLogoAuto() {
+  const nome = document.getElementById('i-nome').value.trim() || '';
+  const dominio = document.getElementById('i-dominio').value.trim() || '';
+  if (!nome && !dominio) return;
+
+  setLogoStatus('loading', '<i class="ti ti-loader"></i> Buscando logo na internet...');
+
+  try {
+    const params = new URLSearchParams({ nome, dominio });
+    const r = await fetch('/api/logo?' + params);
+    const d = await r.json();
+
+    if (d.found && d.url) {
+      // Carrega a imagem e converte para base64
+      await logoParaBase64(d.url);
+      setLogoStatus('ok', `<i class="ti ti-check"></i> Logo encontrada via ${d.source === 'clearbit' ? 'Clearbit' : 'Google'} · ${d.dominio || ''}`);
+    } else {
+      setLogoStatus('err', '<i class="ti ti-alert-circle"></i> Logo não encontrada. Faça upload manual ou a IA criará uma.');
+      logoDataUrl = null;
+    }
+  } catch(e) {
+    setLogoStatus('err', '<i class="ti ti-alert-circle"></i> Erro ao buscar. Tente upload manual.');
+    logoDataUrl = null;
+  }
+}
+
+async function logoParaBase64(url) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width; canvas.height = img.height;
+      canvas.getContext('2d').drawImage(img, 0, 0);
+      try {
+        logoDataUrl = canvas.toDataURL('image/png');
+        mostrarLogoPreview(url);
+        resolve(true);
+      } catch(e) {
+        // CORS block — usa a URL direta mesmo
+        logoDataUrl = url;
+        mostrarLogoPreview(url);
+        resolve(true);
+      }
+    };
+    img.onerror = () => { logoDataUrl = null; resolve(false); };
+    img.src = url;
+  });
+}
+
+function mostrarLogoPreview(url) {
+  const box = document.getElementById('logo-box');
+  const existing = box.querySelector('.logo-preview-img');
+  if (existing) existing.remove();
+  const img = document.createElement('img');
+  img.className = 'logo-preview-img';
+  img.src = url;
+  img.alt = 'Logo';
+  box.insertBefore(img, box.firstChild);
+}
+
+function setLogoStatus(tipo, html) {
+  const el = document.getElementById('logo-status');
+  el.className = 'logo-status ' + tipo;
+  el.innerHTML = html;
+}
+
+function logoUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  setLogoStatus('loading', '<i class="ti ti-loader"></i> Carregando logo...');
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    logoDataUrl = e.target.result;
+    mostrarLogoPreview(logoDataUrl);
+    setLogoStatus('ok', `<i class="ti ti-check"></i> Logo carregada: ${file.name}`);
+  };
+  reader.readAsDataURL(file);
+}
+
+// ══════════════════════════════════════════
 // NAVEGAÇÃO
 // ══════════════════════════════════════════
 function mostrarTela(id) {
@@ -450,7 +560,24 @@ async function gerarGaleria() {
     contato: document.getElementById('i-contato').value,
     estilos: getChips('i-estilos') || 'moderno',
     cor: getCor('i-cores'),
+    logoUrl: logoDataUrl || null,
   };
+
+  // Se não tem logo ainda, tenta buscar automaticamente
+  if (!state.empresa.logoUrl) {
+    const dominio = document.getElementById('i-dominio').value.trim();
+    if (dominio || nome) {
+      try {
+        const params = new URLSearchParams({ nome, dominio });
+        const r = await fetch('/api/logo?' + params);
+        const d = await r.json();
+        if (d.found && d.url) {
+          await logoParaBase64(d.url);
+          state.empresa.logoUrl = logoDataUrl;
+        }
+      } catch(e) {}
+    }
+  }
 
   document.getElementById('btn-gerar').disabled = true;
   document.getElementById('btn-gerar').innerHTML = '<div style="width:20px;height:20px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite"></div> Gerando...';
@@ -549,13 +676,21 @@ async function gerarTemplate(i) {
 }
 
 function buildPrompt(tpl, emp) {
+  const logoInstrucao = emp.logoUrl
+    ? `LOGO REAL DA EMPRESA: A logo está disponível como imagem externa. Use uma tag <image> no SVG para incorporá-la:
+<image href="${emp.logoUrl.startsWith('data:') ? emp.logoUrl.substring(0, 50) + '...(base64)' : emp.logoUrl}" x="..." y="..." width="..." height="..." preserveAspectRatio="xMidYMid meet"/>
+Posicione a logo de forma proeminente na composição. Use a logo REAL em vez de criar um símbolo genérico.
+A URL real para usar é: ${emp.logoUrl.startsWith('data:') ? emp.logoUrl : emp.logoUrl}`
+    : `Crie um símbolo/ícone representativo do setor ${emp.setor} usando apenas formas SVG (círculos, retângulos, paths simples). Não use imagens externas.`;
+
   const base = `Você é um designer gráfico sênior especializado em identidade visual brasileira de alto nível.
 Crie um SVG profissional para a empresa "${emp.nome}" (setor: ${emp.setor}${emp.cidade ? ', ' + emp.cidade : ''}).
 ${emp.slogan ? 'Slogan: ' + emp.slogan + '.' : ''}
 ${emp.contato ? 'Contato/CTA: ' + emp.contato + '.' : ''}
 Estilo visual: ${emp.estilos}. Cor principal: ${emp.cor}.
 Tipo de arte: ${tpl.tipo}.
-viewBox EXATAMENTE "${tpl.viewBox}".`;
+viewBox EXATAMENTE "${tpl.viewBox}".
+${logoInstrucao}`;`;
 
   const instrucoes = {
     feed: `Layout quadrado para feed Instagram. Composição centralizada, hierarquia visual clara: logo/nome em destaque, slogan secundário, CTA no rodapé. Fundo com gradiente ou padrão geométrico que contraste com foto de fundo real. Elementos decorativos modernos.`,
