@@ -1,294 +1,478 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Estúdio de Arte com IA</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
-<style>
-:root{
-  --bg:#0D0B14;--surface:#16121F;--surface2:#1E1929;
-  --border:#2E2840;--border2:#3D3558;
-  --purple:#7F77DD;--purple-light:#AFA9EC;--purple-dark:#534AB7;
-  --coral:#D85A30;--teal:#1D9E75;--amber:#EF9F27;--pink:#D4537E;
-  --red:#E24B4A;
-  --text:#F0EDF8;--text2:#9B94B8;--text3:#5E5880;
-  --radius:14px;--radius-sm:9px;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;min-height:100vh;overflow-x:hidden;}
-body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(127,119,221,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(127,119,221,0.04) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;}
-.orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0}
-.orb1{width:500px;height:500px;background:rgba(127,119,221,0.12);top:-150px;right:-100px}
-.orb2{width:400px;height:400px;background:rgba(216,90,48,0.08);bottom:-100px;left:-80px}
-.orb3{width:300px;height:300px;background:rgba(29,158,117,0.07);top:40%;left:40%}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Estúdio de Arte IA — Mockups Realistas</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:       #0e0b1a;
+      --bg2:      #16112a;
+      --bg3:      #1e1838;
+      --bg4:      #251f40;
+      --border:   rgba(255,255,255,0.08);
+      --border2:  rgba(127,119,221,0.40);
+      --purple:   #7F77DD;
+      --purple-l: #AFA9EC;
+      --purple-d: rgba(127,119,221,0.15);
+      --coral:    #D85A30;
+      --teal:     #1D9E75;
+      --amber:    #EF9F27;
+      --text:     #f0eeff;
+      --text2:    rgba(240,238,255,0.55);
+      --text3:    rgba(240,238,255,0.30);
+      --r:        14px;
+      --r-sm:     9px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh; padding-bottom: 4rem;
+    }
 
-/* ===== API KEY SCREEN ===== */
-#api-screen{
-  position:fixed;inset:0;z-index:100;
-  display:flex;align-items:center;justify-content:center;
-  background:#0D0B14;padding:1.5rem;
-}
-.api-card{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:20px;padding:2.5rem 2rem;
-  max-width:440px;width:100%;text-align:center;
-  position:relative;z-index:1;
-}
-.api-logo{font-size:48px;margin-bottom:1rem;display:block}
-.api-card h2{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:.5rem;background:linear-gradient(135deg,#fff 30%,var(--purple-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.api-card p{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:1.5rem}
-.api-input-wrap{position:relative;margin-bottom:1rem}
-.api-input-wrap input{
-  width:100%;padding:12px 44px 12px 14px;
-  background:var(--surface2);border:1px solid var(--border);
-  border-radius:var(--radius-sm);color:var(--text);font-size:14px;
-  font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s;
-  letter-spacing:.05em;
-}
-.api-input-wrap input:focus{border-color:var(--purple)}
-.eye-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);font-size:18px;padding:2px;}
-.api-btn{
-  width:100%;padding:13px;font-size:15px;font-family:'Syne',sans-serif;font-weight:700;
-  border-radius:var(--radius-sm);cursor:pointer;border:none;
-  background:linear-gradient(135deg,var(--purple-dark),var(--coral));
-  color:#fff;transition:opacity .2s;
-}
-.api-btn:hover{opacity:.88}
-.api-hint{font-size:12px;color:var(--text3);margin-top:.75rem;line-height:1.5}
-.api-hint a{color:var(--purple-light);text-decoration:none}
-.api-hint a:hover{text-decoration:underline}
-.api-error{font-size:12px;color:#F09595;margin-top:.5rem;display:none}
+    /* ── HEADER ── */
+    .header {
+      background: linear-gradient(135deg,#12082a 0%,#1a0f3a 60%,#0e1a2e 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 2.5rem 1.5rem 2rem; position: relative; overflow: hidden;
+    }
+    .orb { position:absolute; border-radius:50%; filter:blur(70px); opacity:.15; pointer-events:none; }
+    .h-inner { position:relative; z-index:1; max-width:700px; margin:0 auto; }
+    .eyebrow {
+      display:inline-flex; align-items:center; gap:6px;
+      font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+      color:var(--purple-l); background:var(--purple-d);
+      border:1px solid rgba(127,119,221,.25); padding:4px 12px; border-radius:20px; margin-bottom:14px;
+    }
+    .header h1 {
+      font-family:'Space Grotesk',sans-serif; font-size:clamp(22px,5vw,32px); font-weight:700; line-height:1.2;
+      background:linear-gradient(135deg,#fff 30%,#AFA9EC 100%);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:10px;
+    }
+    .header p { font-size:14px; color:var(--text2); line-height:1.6; margin-bottom:18px; max-width:520px; }
+    .badges { display:flex; gap:8px; flex-wrap:wrap; }
+    .badge {
+      font-size:11px; font-weight:500; padding:4px 11px; border-radius:20px;
+      border:1px solid; color:rgba(255,255,255,.8);
+    }
+    .bp { background:rgba(127,119,221,.12); border-color:rgba(127,119,221,.35); }
+    .bc { background:rgba(216,90,48,.12);   border-color:rgba(216,90,48,.35); }
+    .bt { background:rgba(29,158,117,.12);  border-color:rgba(29,158,117,.35); }
+    .ba { background:rgba(239,159,39,.12);  border-color:rgba(239,159,39,.35); }
 
-/* ===== MAIN APP ===== */
-#main-app{display:none;position:relative;z-index:1}
-.wrapper{max-width:720px;margin:0 auto;padding:2rem 1.25rem 4rem;position:relative;z-index:1;}
+    /* ── MAIN ── */
+    .main { max-width:700px; margin:0 auto; padding:1.75rem 1.25rem 0; }
 
-/* TOPBAR */
-.topbar{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:2rem;padding-bottom:1rem;
-  border-bottom:1px solid var(--border);
-}
-.topbar-left{display:flex;align-items:center;gap:10px}
-.topbar-logo{font-size:22px}
-.topbar-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--text)}
-.topbar-sub{font-size:11px;color:var(--text3)}
-.key-badge{
-  display:flex;align-items:center;gap:6px;
-  padding:5px 12px;border-radius:30px;font-size:12px;
-  background:rgba(29,158,117,0.1);border:1px solid rgba(29,158,117,0.25);
-  color:#5DCAA5;cursor:pointer;transition:all .15s;
-}
-.key-badge:hover{background:rgba(226,75,74,0.1);border-color:rgba(226,75,74,0.25);color:#F09595}
+    /* ── STEPS ── */
+    .steps {
+      display:flex; gap:0; margin-bottom:1.75rem;
+      background:var(--bg2); border:1px solid var(--border); border-radius:var(--r); overflow:hidden;
+    }
+    .step {
+      flex:1; padding:12px 8px; text-align:center; cursor:pointer;
+      border-right:1px solid var(--border); transition:background .15s; position:relative;
+    }
+    .step:last-child { border-right:none; }
+    .step:hover { background:var(--bg3); }
+    .step.active { background:var(--purple-d); }
+    .step.done .snum { background:var(--teal); color:#fff; }
+    .snum {
+      width:22px; height:22px; border-radius:50%; font-size:11px; font-weight:700;
+      background:var(--bg4); color:var(--text3);
+      display:flex; align-items:center; justify-content:center;
+      margin:0 auto 4px; transition:all .2s;
+    }
+    .step.active .snum { background:var(--purple); color:#fff; }
+    .slabel { font-size:11px; font-weight:600; color:var(--text2); display:block; }
+    .step.active .slabel { color:var(--text); }
 
-/* HEADER */
-header{text-align:center;padding:1rem 0 2rem}
-.logo-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:30px;background:rgba(127,119,221,0.12);border:1px solid rgba(127,119,221,0.3);font-size:12px;font-weight:500;color:var(--purple-light);margin-bottom:1.25rem;letter-spacing:.04em;text-transform:uppercase;}
-.logo-dot{width:6px;height:6px;border-radius:50%;background:var(--purple);animation:blink 2s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-header h1{font-family:'Syne',sans-serif;font-size:clamp(26px,5vw,42px);font-weight:800;line-height:1.1;background:linear-gradient(135deg,#fff 30%,var(--purple-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.75rem;}
-header p{font-size:15px;color:var(--text2);max-width:420px;margin:0 auto 1.5rem;line-height:1.6}
-.header-pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
-.pill{display:flex;align-items:center;gap:5px;padding:5px 13px;border-radius:30px;font-size:12px;font-weight:500;border:1px solid;}
-.pill-p{background:rgba(127,119,221,0.1);border-color:rgba(127,119,221,0.25);color:#AFA9EC}
-.pill-c{background:rgba(216,90,48,0.1);border-color:rgba(216,90,48,0.25);color:#F0997B}
-.pill-t{background:rgba(29,158,117,0.1);border-color:rgba(29,158,117,0.25);color:#5DCAA5}
-.pill-a{background:rgba(239,159,39,0.1);border-color:rgba(239,159,39,0.25);color:#FAC775}
-.pill-k{background:rgba(212,83,126,0.1);border-color:rgba(212,83,126,0.25);color:#ED93B1}
+    /* ── CARD ── */
+    .card {
+      background:var(--bg2); border:1px solid var(--border);
+      border-radius:var(--r); padding:1.25rem; margin-bottom:1rem;
+    }
+    .card-title {
+      font-size:13px; font-weight:700; color:var(--text); margin-bottom:1rem;
+      display:flex; align-items:center; gap:8px;
+    }
+    .card-title i { color:var(--purple-l); font-size:16px; }
 
-/* MODES */
-.mode-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem;}
-.mtab{padding:14px 10px;border-radius:var(--radius);cursor:pointer;border:1px solid var(--border);background:var(--surface);text-align:center;transition:all .2s;}
-.mtab:hover{border-color:var(--border2);background:var(--surface2)}
-.mtab.active{border:1.5px solid var(--purple);background:rgba(127,119,221,0.1);}
-.mtab-icon{font-size:22px;display:block;margin-bottom:5px}
-.mtab-label{font-family:'Syne',sans-serif;font-size:13px;font-weight:600;display:block;color:var(--text)}
-.mtab-sub{font-size:11px;color:var(--text3);display:block;margin-top:2px}
+    /* ── FORM ── */
+    .fg { margin-bottom:.9rem; }
+    .fg:last-child { margin-bottom:0; }
+    .flabel {
+      display:flex; align-items:center; gap:6px;
+      font-size:11px; font-weight:700; color:var(--text2);
+      text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px;
+    }
+    input, textarea, select {
+      width:100%; background:var(--bg3); border:1px solid var(--border);
+      border-radius:var(--r-sm); color:var(--text);
+      font-family:'Inter',sans-serif; font-size:14px; padding:10px 12px;
+      outline:none; transition:border-color .15s;
+    }
+    input::placeholder, textarea::placeholder { color:var(--text3); }
+    input:focus, textarea:focus, select:focus { border-color:var(--border2); }
+    select option { background:#1e1838; }
+    textarea { height:72px; resize:vertical; }
+    .row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 
-/* CARD */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.4rem;margin-bottom:1rem;}
-.tpl-title{font-size:12px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.6rem}
-.tpl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:1.1rem}
-.tpl-btn{padding:9px 8px;border-radius:var(--radius-sm);cursor:pointer;border:1px solid var(--border);background:var(--surface2);font-size:12px;color:var(--text2);text-align:center;transition:all .15s;}
-.tpl-btn:hover{border-color:var(--purple);color:var(--purple-light);background:rgba(127,119,221,0.08)}
-.tpl-icon{font-size:17px;display:block;margin-bottom:3px}
-.fg{margin-bottom:.9rem}.fg:last-child{margin-bottom:0}
-.flabel{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;}
-input,textarea,select{width:100%;padding:10px 13px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s;-webkit-appearance:none;}
-input:focus,textarea:focus,select:focus{border-color:var(--purple)}
-select option{background:var(--surface2)}
-textarea{height:72px;resize:vertical}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{padding:5px 13px;border-radius:30px;font-size:12px;font-weight:500;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;}
-.chip:hover{border-color:var(--purple);color:var(--purple-light)}
-.chip.on{background:rgba(127,119,221,0.15);border-color:var(--purple);color:var(--purple-light);}
-.cp-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
-.cp{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s;position:relative;}
-.cp.on{border-color:#fff;transform:scale(1.15)}
-.cp.on::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:700;}
-.sec{display:none}.sec.active{display:block}
+    /* ── CHIPS ── */
+    .chips { display:flex; flex-wrap:wrap; gap:6px; }
+    .chip {
+      display:inline-flex; align-items:center; gap:4px;
+      padding:5px 12px; border-radius:20px; font-size:12px; font-weight:500;
+      border:1px solid var(--border); background:var(--bg3);
+      color:var(--text2); cursor:pointer; transition:all .12s; user-select:none;
+    }
+    .chip:hover { border-color:var(--border2); color:var(--purple-l); }
+    .chip.on { background:var(--purple-d); border-color:var(--purple); color:var(--purple-l); }
 
-/* BTN GEN */
-.btn-gen{width:100%;padding:15px;font-size:16px;font-family:'Syne',sans-serif;font-weight:700;border-radius:var(--radius);cursor:pointer;border:none;background:linear-gradient(135deg,var(--purple-dark),var(--coral));color:#fff;letter-spacing:.02em;position:relative;overflow:hidden;transition:opacity .2s,transform .15s;}
-.btn-gen::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.08),transparent);pointer-events:none;}
-.btn-gen:hover{opacity:.88}
-.btn-gen:active{transform:scale(.99);opacity:.75}
+    /* ── COLOR PICKER ── */
+    .color-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+    .cpick {
+      width:28px; height:28px; border-radius:50%; cursor:pointer;
+      border:2.5px solid transparent; transition:all .12s; flex-shrink:0;
+    }
+    .cpick.on { border-color:#fff; box-shadow:0 0 0 2px rgba(255,255,255,.25); transform:scale(1.12); }
 
-/* RESULT */
-.result-wrap{margin-top:1.5rem;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);background:var(--surface);}
-.result-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:linear-gradient(135deg,#1a0f2e,#1E1929);border-bottom:1px solid var(--border);}
-.result-bar-left{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:var(--text)}
-.sdot{width:8px;height:8px;border-radius:50%;background:var(--amber);transition:background .4s}
-.rtag{font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(127,119,221,0.15);border:1px solid rgba(127,119,221,0.25);color:var(--purple-light);}
-.loading-box{padding:3rem 1rem;text-align:center;background:var(--surface2)}
-.spin{width:36px;height:36px;border:2px solid var(--border2);border-top-color:var(--purple);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1rem;}
-@keyframes spin{to{transform:rotate(360deg)}}
-.load-txt{font-size:14px;color:var(--text2);margin-bottom:.75rem}
-.load-steps{display:flex;justify-content:center;gap:5px}
-.lstep{width:7px;height:7px;border-radius:50%;background:var(--border2)}
-.lstep.pulse{background:var(--purple);animation:pulse 1s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.output-box{padding:1.25rem}
-.art-frame{border-radius:var(--radius-sm);overflow:hidden;background:#f8f6ff;display:flex;align-items:center;justify-content:center;margin-bottom:1rem;min-height:180px;border:1px solid var(--border);}
-.art-frame svg{max-width:100%;height:auto;display:block}
-.desc-box{background:rgba(127,119,221,0.08);border:1px solid rgba(127,119,221,0.2);border-radius:var(--radius-sm);padding:1rem;margin-bottom:1rem;}
-.desc-box-label{font-size:11px;font-weight:600;color:var(--purple-light);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
-.desc-box p{font-size:13px;color:var(--text2);line-height:1.65}
-.actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-.abtn{padding:10px 8px;font-size:13px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface2);color:var(--text);display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;}
-.abtn:hover{border-color:var(--border2);background:var(--surface)}
-.abtn.ok{background:rgba(29,158,117,0.12);border-color:rgba(29,158,117,0.3);color:#5DCAA5}
+    /* ── CENÁRIOS DE MOCKUP ── */
+    .scenarios {
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:10px;
+    }
+    .scenario-card {
+      border-radius:var(--r-sm); overflow:hidden; cursor:pointer;
+      border:2px solid var(--border); position:relative; transition:all .15s;
+      background:var(--bg3);
+    }
+    .scenario-card:hover { border-color:var(--border2); }
+    .scenario-card.active { border-color:var(--purple); box-shadow:0 0 16px rgba(127,119,221,.25); }
+    .scenario-thumb {
+      width:100%; height:80px; object-fit:cover; display:block;
+      background:var(--bg4); transition:opacity .2s;
+    }
+    .scenario-label {
+      padding:7px 8px; font-size:11px; font-weight:600; color:var(--text2);
+      display:flex; align-items:center; gap:5px;
+    }
+    .scenario-card.active .scenario-label { color:var(--purple-l); }
+    .scenario-check {
+      position:absolute; top:5px; right:5px;
+      width:18px; height:18px; border-radius:50%; background:var(--purple);
+      display:none; align-items:center; justify-content:center;
+      font-size:10px; color:#fff;
+    }
+    .scenario-card.active .scenario-check { display:flex; }
 
-/* HISTORY */
-.hist-section{margin-top:2rem}
-.hist-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem}
-.hist-top h2{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px;}
-.hist-clr{font-size:12px;color:var(--text3);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:4px 8px;border-radius:6px;transition:all .15s;}
-.hist-clr:hover{background:rgba(226,75,74,0.1);color:#F09595}
-.hist-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
-.hist-card{border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--border);cursor:pointer;background:var(--surface);transition:all .18s;}
-.hist-card:hover{border-color:var(--purple);transform:translateY(-2px)}
-.hist-thumb{aspect-ratio:4/3;background:#f8f6ff;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:6px;}
-.hist-thumb svg{max-width:100%;max-height:100%;display:block}
-.hist-meta{padding:7px 9px;border-top:1px solid var(--border)}
-.hist-name{font-size:11px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hist-time{font-size:10px;color:var(--text3);margin-top:1px}
-.empty-hist{grid-column:1/-1;text-align:center;padding:2.5rem 1rem;border:1px dashed var(--border2);border-radius:var(--radius);color:var(--text3);font-size:13px;}
-.empty-hist span{display:block;font-size:26px;margin-bottom:.5rem;opacity:.4}
+    /* ── PREVIEW FOTO ── */
+    .foto-preview {
+      border-radius:var(--r-sm); overflow:hidden; position:relative;
+      background:var(--bg3); border:1px solid var(--border); margin-bottom:1rem;
+    }
+    .foto-preview img {
+      width:100%; height:200px; object-fit:cover; display:block;
+    }
+    .foto-credit {
+      position:absolute; bottom:0; left:0; right:0;
+      padding:5px 10px; background:rgba(0,0,0,.5);
+      font-size:10px; color:rgba(255,255,255,.6);
+      display:flex; align-items:center; gap:4px;
+    }
+    .foto-credit a { color:rgba(255,255,255,.7); text-decoration:none; }
+    .btn-nova-foto {
+      width:100%; padding:9px; font-size:12px; font-weight:600;
+      border-radius:var(--r-sm); border:1px solid var(--border);
+      background:var(--bg3); color:var(--text2); cursor:pointer;
+      display:flex; align-items:center; justify-content:center; gap:6px;
+      transition:all .12s; font-family:'Inter',sans-serif;
+    }
+    .btn-nova-foto:hover { border-color:var(--border2); color:var(--text); }
 
-footer{text-align:center;margin-top:3rem;font-size:12px;color:var(--text3);}
-footer strong{color:var(--purple-light)}
+    /* ── BTN PRINCIPAL ── */
+    .btn-gen {
+      width:100%; padding:14px; font-size:15px; font-weight:700;
+      border-radius:var(--r); cursor:pointer; border:none;
+      background:linear-gradient(135deg,#7F77DD,#5e57b5 50%,#D85A30);
+      color:#fff; letter-spacing:.02em; margin-top:.5rem;
+      font-family:'Space Grotesk',sans-serif;
+      transition:opacity .15s, transform .12s;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+    }
+    .btn-gen:hover { opacity:.88; }
+    .btn-gen:active { opacity:.75; transform:scale(.99); }
+    .btn-gen:disabled { opacity:.4; cursor:not-allowed; }
 
-/* TOAST */
-.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(20px);background:var(--teal);color:#fff;padding:10px 20px;border-radius:30px;font-size:13px;font-weight:500;opacity:0;transition:all .3s;pointer-events:none;z-index:999;}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    /* ── RESULTADO ── */
+    .result-wrap {
+      margin-top:1.5rem; border-radius:var(--r);
+      overflow:hidden; border:1px solid var(--border);
+    }
+    .result-bar {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:10px 16px;
+      background:linear-gradient(90deg,#12082a,#1a0f3a);
+      border-bottom:1px solid var(--border);
+    }
+    .sdot { width:8px; height:8px; border-radius:50%; background:var(--amber); flex-shrink:0; transition:background .3s; }
+    .sdot.ok  { background:var(--teal); }
+    .sdot.err { background:#E24B4A; }
+    .result-bar-l { display:flex; align-items:center; gap:8px; }
+    .result-bar span { font-size:13px; font-weight:500; }
+    .rtag {
+      font-size:11px; background:rgba(255,255,255,.08);
+      padding:3px 9px; border-radius:10px; color:var(--text2);
+    }
 
-@media(max-width:500px){
-  .tpl-grid{grid-template-columns:repeat(2,1fr)}
-  .hist-grid{grid-template-columns:repeat(2,1fr)}
-  .actions{grid-template-columns:1fr 1fr}
-  .actions .abtn:last-child{grid-column:1/-1}
-  .api-card{padding:2rem 1.25rem}
-}
-</style>
+    /* ── LOADING ── */
+    .loading-box { padding:3rem 1rem; text-align:center; background:var(--bg2); }
+    .spin {
+      width:34px; height:34px; border:2px solid rgba(127,119,221,.2);
+      border-top-color:var(--purple); border-radius:50%;
+      animation:spin .75s linear infinite; margin:0 auto 1rem;
+    }
+    @keyframes spin { to{transform:rotate(360deg)} }
+    .lmsg { font-size:13px; color:var(--text2); }
+    .lsteps { display:flex; justify-content:center; gap:6px; margin-top:1rem; }
+    .lstep { width:7px; height:7px; border-radius:50%; background:var(--border); }
+    .lstep.pulse { background:var(--purple); animation:pulse 1s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+    /* ── OUTPUT MOCKUP ── */
+    .output-box { padding:1.25rem; background:var(--bg2); }
+    .mockup-wrap {
+      position:relative; border-radius:10px; overflow:hidden;
+      border:1px solid var(--border); margin-bottom:1rem;
+      background:#000;
+    }
+    .mockup-bg {
+      width:100%; height:280px; object-fit:cover; display:block;
+      filter:brightness(.75);
+    }
+    .mockup-overlay {
+      position:absolute; inset:0;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      padding:1.5rem;
+    }
+    #svg-canvas {
+      max-width:280px; max-height:180px; width:100%;
+      filter:drop-shadow(0 4px 24px rgba(0,0,0,.7));
+    }
+    #svg-canvas svg { max-width:100%; height:auto; }
+    .mockup-badge {
+      position:absolute; bottom:10px; right:10px;
+      font-size:10px; background:rgba(0,0,0,.5); color:rgba(255,255,255,.5);
+      padding:3px 8px; border-radius:8px; backdrop-filter:blur(4px);
+    }
+
+    .desc-card {
+      background:var(--purple-d); border:1px solid rgba(127,119,221,.2);
+      border-radius:10px; padding:1rem; margin-bottom:1rem;
+    }
+    .desc-label {
+      font-size:10px; font-weight:700; color:var(--purple-l);
+      text-transform:uppercase; letter-spacing:.08em; margin-bottom:6px;
+      display:flex; align-items:center; gap:5px;
+    }
+    .desc-card p { font-size:13px; color:var(--text2); line-height:1.65; }
+
+    .action-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+    .btn-sec {
+      padding:10px 6px; font-size:12px; font-weight:500; cursor:pointer;
+      border-radius:var(--r-sm); border:1px solid var(--border);
+      background:var(--bg3); color:var(--text);
+      display:flex; align-items:center; justify-content:center; gap:5px;
+      transition:all .12s; font-family:'Inter',sans-serif;
+    }
+    .btn-sec:hover { background:var(--bg); border-color:var(--border2); }
+
+    /* ── ERROR ── */
+    .error-box { padding:2rem 1.25rem; text-align:center; background:var(--bg2); }
+    .error-icon { font-size:32px; color:#E24B4A; margin-bottom:10px; }
+    .error-msg { font-size:13px; color:var(--text2); margin-bottom:1rem; line-height:1.5; }
+    .btn-retry {
+      display:inline-flex; align-items:center; gap:6px;
+      padding:9px 18px; font-size:13px; font-weight:500;
+      border-radius:var(--r-sm); cursor:pointer;
+      border:1px solid var(--border2); background:var(--purple-d); color:var(--purple-l);
+      font-family:'Inter',sans-serif; transition:all .12s;
+    }
+    .btn-retry:hover { background:rgba(127,119,221,.25); }
+
+    /* ── FOOTER ── */
+    .footer { text-align:center; padding:2rem 1rem 0; font-size:11px; color:var(--text3); }
+    .footer a { color:var(--text3); }
+
+    /* ── SOURCE TOGGLE ── */
+    .source-btn {
+      display:flex; flex-direction:column; align-items:center; gap:3px;
+      padding:10px 8px; border-radius:var(--r-sm); cursor:pointer;
+      border:1px solid var(--border); background:var(--bg3); color:var(--text2);
+      font-family:'Inter',sans-serif; transition:all .15s;
+    }
+    .source-btn i { font-size:18px; }
+    .source-btn span { font-size:13px; font-weight:600; color:var(--text); }
+    .source-btn small { font-size:10px; color:var(--text3); }
+    .source-btn:hover { border-color:var(--border2); }
+    .source-btn.active {
+      border-color:var(--purple); background:var(--purple-d);
+      box-shadow:0 0 12px rgba(127,119,221,.2);
+    }
+    .source-btn.active span { color:var(--purple-l); }
+
+    @media(max-width:480px) {
+      .row2 { grid-template-columns:1fr; }
+      .action-row { grid-template-columns:1fr 1fr; }
+      .scenarios { grid-template-columns:repeat(2,1fr); }
+      .steps .slabel { display:none; }
+    }
+  </style>
 </head>
 <body>
-<div class="orb orb1"></div>
-<div class="orb orb2"></div>
-<div class="orb orb3"></div>
 
-<!-- ===== TELA DE API KEY ===== -->
-<div id="api-screen">
-  <div class="api-card">
-    <span class="api-logo">🎨</span>
-    <h2>Estúdio de Arte com IA</h2>
-    <p>Para começar, insira sua chave da API Anthropic. Ela é usada apenas para gerar suas artes e <strong>nunca é armazenada</strong>.</p>
-    <div class="api-input-wrap">
-      <input type="password" id="api-key-input" placeholder="sk-ant-api03-..." autocomplete="off"/>
-      <button class="eye-btn" onclick="toggleApiVis()" title="Mostrar/ocultar">👁</button>
-    </div>
-    <div class="api-error" id="api-error">❌ Chave inválida. Verifique e tente novamente.</div>
-    <button class="api-btn" onclick="entrarComKey()">✦ Entrar no Estúdio</button>
-    <div class="api-hint">
-      Não tem uma chave?
-      <a href="https://console.anthropic.com" target="_blank">Crie gratuitamente em console.anthropic.com</a>
+<!-- HEADER -->
+<div class="header">
+  <div class="orb" style="width:320px;height:320px;background:#7F77DD;top:-120px;right:-80px"></div>
+  <div class="orb" style="width:200px;height:200px;background:#D85A30;bottom:-60px;left:40px"></div>
+  <div class="orb" style="width:140px;height:140px;background:#1D9E75;top:30px;left:38%"></div>
+  <div class="h-inner">
+    <div class="eyebrow"><i class="ti ti-sparkles"></i> Claude AI + Unsplash + Google</div>
+    <h1>Estúdio de Arte IA</h1>
+    <p>Veja a identidade visual da empresa em cenários reais — fachadas, outdoors, câmeras e muito mais.</p>
+    <div class="badges">
+      <span class="badge bp"><i class="ti ti-building"></i> Mockup realista</span>
+      <span class="badge bc"><i class="ti ti-camera"></i> Fotos reais</span>
+      <span class="badge bt"><i class="ti ti-wand"></i> Logo gerado por IA</span>
+      <span class="badge ba"><i class="ti ti-download"></i> Exporta SVG + PNG</span>
     </div>
   </div>
 </div>
 
-<!-- ===== APP PRINCIPAL ===== -->
-<div id="main-app">
-<div class="wrapper">
+<div class="main">
 
-  <!-- TOPBAR -->
-  <div class="topbar">
-    <div class="topbar-left">
-      <span class="topbar-logo">🎨</span>
-      <div>
-        <div class="topbar-title">Estúdio de Arte com IA</div>
-        <div class="topbar-sub">Powered by Claude AI</div>
-      </div>
+  <!-- STEPS -->
+  <div class="steps">
+    <div class="step active" id="st-1" onclick="goStep(1)">
+      <div class="snum">1</div>
+      <span class="slabel">Empresa</span>
     </div>
-    <button class="key-badge" onclick="trocarKey()" title="Trocar API Key">🔑 <span id="key-preview">sk-ant-...</span> &nbsp;Trocar</button>
+    <div class="step" id="st-2" onclick="goStep(2)">
+      <div class="snum">2</div>
+      <span class="slabel">Cenário</span>
+    </div>
+    <div class="step" id="st-3" onclick="goStep(3)">
+      <div class="snum">3</div>
+      <span class="slabel">Estilo</span>
+    </div>
+    <div class="step" id="st-4" onclick="goStep(4)">
+      <div class="snum">4</div>
+      <span class="slabel">Gerar</span>
+    </div>
   </div>
 
-  <header>
-    <div class="logo-badge"><span class="logo-dot"></span> IA Generativa</div>
-    <h1>Crie artes únicas<br>com Inteligência Artificial</h1>
-    <p>Descreva sua ideia e a IA transforma em arte profissional para empresas e pessoas</p>
-    <div class="header-pills">
-      <span class="pill pill-p">🏢 Empresas</span>
-      <span class="pill pill-c">👤 Pessoal</span>
-      <span class="pill pill-t">🎨 Arte livre</span>
-      <span class="pill pill-a">📁 Templates</span>
-      <span class="pill pill-k">💾 Histórico</span>
-    </div>
-  </header>
-
-  <!-- MODOS -->
-  <div class="mode-tabs">
-    <button class="mtab active" onclick="setMode('empresa',this)">
-      <span class="mtab-icon">🏢</span>
-      <span class="mtab-label">Empresa</span>
-      <span class="mtab-sub">Logo · Banner · Post</span>
-    </button>
-    <button class="mtab" onclick="setMode('pessoa',this)">
-      <span class="mtab-icon">👤</span>
-      <span class="mtab-label">Pessoal</span>
-      <span class="mtab-sub">Perfil · Portfólio</span>
-    </button>
-    <button class="mtab" onclick="setMode('livre',this)">
-      <span class="mtab-icon">✨</span>
-      <span class="mtab-label">Arte livre</span>
-      <span class="mtab-sub">Qualquer ideia</span>
-    </button>
-  </div>
-
-  <!-- EMPRESA -->
-  <div id="sec-empresa" class="sec active">
+  <!-- PASSO 1: EMPRESA -->
+  <div id="passo-1" class="passo">
     <div class="card">
-      <div class="tpl-title">⚡ Templates rápidos</div>
-      <div class="tpl-grid">
-        <div class="tpl-btn" onclick="applyE('tech')"><span class="tpl-icon">💻</span>Startup Tech</div>
-        <div class="tpl-btn" onclick="applyE('food')"><span class="tpl-icon">☕</span>Restaurante</div>
-        <div class="tpl-btn" onclick="applyE('saude')"><span class="tpl-icon">🏥</span>Saúde</div>
-        <div class="tpl-btn" onclick="applyE('moda')"><span class="tpl-icon">👗</span>Moda</div>
-        <div class="tpl-btn" onclick="applyE('edu')"><span class="tpl-icon">📚</span>Educação</div>
-        <div class="tpl-btn" onclick="applyE('fin')"><span class="tpl-icon">💰</span>Finanças</div>
+      <div class="card-title"><i class="ti ti-building"></i> Dados da empresa</div>
+      <div class="fg">
+        <div class="flabel"><i class="ti ti-building"></i> Nome da empresa</div>
+        <input type="text" id="e-nome" placeholder="Ex: Nova Tech, Café do Bairro, Aliança Monitoramento..." />
       </div>
-      <div class="fg"><div class="flabel">🏢 Nome da empresa</div><input type="text" id="e-nome" placeholder="Ex: Nova Tech, Café Aurora, Studio Bloom..."/></div>
       <div class="row2">
-        <div class="fg"><div class="flabel">📂 Setor</div>
-          <select id="e-setor"><option>Tecnologia</option><option>Saúde</option><option>Educação</option><option>Alimentação</option><option>Moda</option><option>Finanças</option><option>Imóveis</option><option>Beleza</option><option>Esportes</option><option>Jurídico</option><option>Outro</option></select>
+        <div class="fg">
+          <div class="flabel"><i class="ti ti-category"></i> Setor</div>
+          <select id="e-setor">
+            <option>Tecnologia</option><option>Segurança</option><option>Saúde</option>
+            <option>Educação</option><option>Alimentação</option><option>Moda</option>
+            <option>Finanças</option><option>Imóveis</option><option>Beleza</option>
+            <option>Esportes</option><option>Varejo</option><option>Outro</option>
+          </select>
         </div>
-        <div class="fg"><div class="flabel">🎨 Tipo de arte</div>
-          <select id="e-tipo"><option>Logo / Identidade visual</option><option>Banner redes sociais</option><option>Post Instagram</option><option>Cartão de visita</option><option>Capa de perfil</option></select>
+        <div class="fg">
+          <div class="flabel"><i class="ti ti-map-pin"></i> Cidade (opcional)</div>
+          <input type="text" id="e-cidade" placeholder="Ex: Maceió, São Paulo..." />
         </div>
       </div>
-      <div class="fg"><div class="flabel">✏️ Estilo visual</div>
+      <div class="fg">
+        <div class="flabel"><i class="ti ti-notes"></i> Slogan ou descrição curta</div>
+        <input type="text" id="e-slogan" placeholder="Ex: Protegendo o que é seu, Sabor que conecta..." />
+      </div>
+    </div>
+    <button class="btn-gen" onclick="goStep(2)">
+      Próximo — Escolher cenário <i class="ti ti-arrow-right"></i>
+    </button>
+  </div>
+
+  <!-- PASSO 2: CENÁRIO -->
+  <div id="passo-2" class="passo" style="display:none">
+    <div class="card">
+      <div class="card-title"><i class="ti ti-photo"></i> Onde aplicar a marca?</div>
+      <div class="scenarios" id="scenario-grid">
+        <!-- gerado por JS -->
+      </div>
+    </div>
+
+    <!-- Fonte da imagem + busca livre -->
+    <div id="foto-wrap" style="display:none">
+      <div class="card">
+        <div class="card-title"><i class="ti ti-photo-search"></i> Fonte da imagem</div>
+
+        <!-- Toggle Unsplash / Google -->
+        <div class="fg">
+          <div class="flabel"><i class="ti ti-database"></i> Banco de imagens</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <button class="source-btn active" id="src-unsplash" onclick="setSource('unsplash')">
+              <i class="ti ti-photo"></i>
+              <span>Unsplash</span>
+              <small>Cenários gerais</small>
+            </button>
+            <button class="source-btn" id="src-google" onclick="setSource('google')">
+              <i class="ti ti-brand-google"></i>
+              <span>Google</span>
+              <small>Produtos de marca</small>
+            </button>
+          </div>
+        </div>
+
+        <!-- Busca personalizada -->
+        <div class="fg">
+          <div class="flabel"><i class="ti ti-search"></i> Busca personalizada <span style="font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></div>
+          <div style="display:flex;gap:8px">
+            <input type="text" id="foto-query-custom" placeholder='Ex: câmera Intelbras, alarme residencial, cerca elétrica...' style="flex:1" />
+            <button onclick="buscarFotoCustom()" style="padding:10px 14px;border-radius:var(--r-sm);border:1px solid var(--border2);background:var(--purple-d);color:var(--purple-l);cursor:pointer;font-size:13px;white-space:nowrap;font-family:Inter,sans-serif;display:flex;align-items:center;gap:5px;">
+              <i class="ti ti-search"></i> Buscar
+            </button>
+          </div>
+        </div>
+
+        <!-- Preview -->
+        <div class="foto-preview" id="foto-preview">
+          <img id="foto-img" src="" alt="Cenário" />
+          <div class="foto-credit">
+            <i class="ti ti-camera"></i>
+            <span id="foto-source-label">Foto por</span> <a id="foto-credit-link" href="#" target="_blank">–</a>
+          </div>
+        </div>
+        <button class="btn-nova-foto" onclick="buscarFoto()">
+          <i class="ti ti-refresh"></i> Outra foto deste cenário
+        </button>
+      </div>
+    </div>
+
+    <button class="btn-gen" id="btn-step2" onclick="goStep(3)" disabled>
+      Próximo — Estilo visual <i class="ti ti-arrow-right"></i>
+    </button>
+  </div>
+
+  <!-- PASSO 3: ESTILO -->
+  <div id="passo-3" class="passo" style="display:none">
+    <div class="card">
+      <div class="card-title"><i class="ti ti-brush"></i> Estilo visual da marca</div>
+      <div class="fg">
+        <div class="flabel"><i class="ti ti-palette"></i> Estilo</div>
         <div class="chips" id="e-estilos">
           <span class="chip on" onclick="this.classList.toggle('on')">Moderno</span>
           <span class="chip" onclick="this.classList.toggle('on')">Minimalista</span>
@@ -297,387 +481,467 @@ footer strong{color:var(--purple-light)}
           <span class="chip" onclick="this.classList.toggle('on')">Elegante</span>
           <span class="chip" onclick="this.classList.toggle('on')">Bold</span>
           <span class="chip" onclick="this.classList.toggle('on')">Futurista</span>
-          <span class="chip" onclick="this.classList.toggle('on')">Orgânico</span>
+          <span class="chip" onclick="this.classList.toggle('on')">Tecnológico</span>
         </div>
       </div>
-      <div class="fg"><div class="flabel">🎨 Cor principal</div>
-        <div class="cp-row" id="e-cores">
-          <div class="cp on" style="background:#7F77DD" data-n="roxo" onclick="pickC(this,'e-cores')"></div>
-          <div class="cp" style="background:#D85A30" data-n="coral" onclick="pickC(this,'e-cores')"></div>
-          <div class="cp" style="background:#1D9E75" data-n="verde" onclick="pickC(this,'e-cores')"></div>
-          <div class="cp" style="background:#378ADD" data-n="azul" onclick="pickC(this,'e-cores')"></div>
-          <div class="cp" style="background:#EF9F27" data-n="âmbar" onclick="pickC(this,'e-cores')"></div>
-          <div class="cp" style="background:#D4537E" data-n="rosa" onclick="pickC(this,'e-cores')"></div>
-          <div class="cp" style="background:#F0EDF8" data-n="branco" onclick="pickC(this,'e-cores')"></div>
-          <div class="cp" style="background:#2C2C2A;border:1px solid #555" data-n="preto" onclick="pickC(this,'e-cores')"></div>
+      <div class="fg">
+        <div class="flabel"><i class="ti ti-color-picker"></i> Cor principal</div>
+        <div class="color-row" id="e-cores">
+          <div class="cpick on" style="background:#7F77DD" data-name="roxo"    onclick="pickColor(this)"></div>
+          <div class="cpick"    style="background:#D85A30" data-name="coral"   onclick="pickColor(this)"></div>
+          <div class="cpick"    style="background:#1D9E75" data-name="verde"   onclick="pickColor(this)"></div>
+          <div class="cpick"    style="background:#378ADD" data-name="azul"    onclick="pickColor(this)"></div>
+          <div class="cpick"    style="background:#BA7517" data-name="âmbar"   onclick="pickColor(this)"></div>
+          <div class="cpick"    style="background:#D4537E" data-name="rosa"    onclick="pickColor(this)"></div>
+          <div class="cpick"    style="background:#C0A060" data-name="dourado" onclick="pickColor(this)"></div>
+          <div class="cpick"    style="background:#e8e8e6" data-name="branco"  onclick="pickColor(this)"></div>
         </div>
       </div>
-      <div class="fg"><div class="flabel">📝 Detalhes extras</div><textarea id="e-extra" placeholder="Slogan, público-alvo, valores da marca, inspirações..."></textarea></div>
+      <div class="fg">
+        <div class="flabel"><i class="ti ti-photo"></i> Tipo de arte</div>
+        <select id="e-tipo">
+          <option>Logo / Identidade visual</option>
+          <option>Banner institucional</option>
+          <option>Post redes sociais</option>
+          <option>Cartão de visita</option>
+          <option>Placa / Sinalização</option>
+        </select>
+      </div>
+      <div class="fg">
+        <div class="flabel"><i class="ti ti-notes"></i> Detalhes extras <span style="font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></div>
+        <textarea id="e-extra" placeholder="Valores da marca, público-alvo, referências visuais, elementos obrigatórios..."></textarea>
+      </div>
     </div>
-    <button class="btn-gen" onclick="gerar('empresa')">✦ Criar arte agora</button>
+    <button class="btn-gen" onclick="gerarMockup()">
+      <i class="ti ti-wand"></i> Gerar mockup agora
+    </button>
   </div>
 
-  <!-- PESSOA -->
-  <div id="sec-pessoa" class="sec">
-    <div class="card">
-      <div class="tpl-title">⚡ Templates rápidos</div>
-      <div class="tpl-grid">
-        <div class="tpl-btn" onclick="applyP('musico')"><span class="tpl-icon">🎵</span>Músico</div>
-        <div class="tpl-btn" onclick="applyP('designer')"><span class="tpl-icon">🖌️</span>Designer</div>
-        <div class="tpl-btn" onclick="applyP('atleta')"><span class="tpl-icon">🏃</span>Atleta</div>
-        <div class="tpl-btn" onclick="applyP('chef')"><span class="tpl-icon">👨‍🍳</span>Chef</div>
-        <div class="tpl-btn" onclick="applyP('dev')"><span class="tpl-icon">💻</span>Dev</div>
-        <div class="tpl-btn" onclick="applyP('foto')"><span class="tpl-icon">📷</span>Fotógrafo</div>
-      </div>
-      <div class="fg"><div class="flabel">👤 Seu nome ou apelido</div><input type="text" id="p-nome" placeholder="Ex: Ana Lima, @anadraws, DJ Volt..."/></div>
-      <div class="row2">
-        <div class="fg"><div class="flabel">🎯 Finalidade</div>
-          <select id="p-tipo"><option>Foto de perfil artística</option><option>Capa de rede social</option><option>Cartão pessoal</option><option>Arte para portfólio</option><option>Presente personalizado</option></select>
+  <!-- PASSO 4: RESULTADO -->
+  <div id="passo-4" class="passo" style="display:none">
+    <div class="result-wrap" id="result-wrap">
+      <div class="result-bar">
+        <div class="result-bar-l">
+          <div class="sdot" id="sdot"></div>
+          <span id="result-label">Gerando mockup...</span>
         </div>
-        <div class="fg"><div class="flabel">🖼️ Estilo</div>
-          <select id="p-estilo"><option>Ilustração digital</option><option>Aquarela</option><option>Flat design</option><option>Cartoon</option><option>Arte abstrata</option><option>Geométrico</option></select>
+        <span class="rtag" id="rtag">–</span>
+      </div>
+      <div id="result-body">
+        <!-- LOADING -->
+        <div class="loading-box" id="loading-box">
+          <div class="spin"></div>
+          <div class="lmsg" id="lmsg">Buscando foto do cenário...</div>
+          <div class="lsteps">
+            <div class="lstep pulse" id="ls0"></div>
+            <div class="lstep" id="ls1"></div>
+            <div class="lstep" id="ls2"></div>
+            <div class="lstep" id="ls3"></div>
+          </div>
+        </div>
+        <!-- OUTPUT -->
+        <div class="output-box" id="output-box" style="display:none">
+          <div class="mockup-wrap">
+            <img class="mockup-bg" id="mockup-bg" src="" alt="Cenário" />
+            <div class="mockup-overlay">
+              <div id="svg-canvas"></div>
+            </div>
+            <div class="mockup-badge" id="mockup-badge">📸 Unsplash</div>
+          </div>
+          <div class="desc-card">
+            <div class="desc-label"><i class="ti ti-info-circle"></i> Sobre este mockup</div>
+            <p id="art-desc"></p>
+          </div>
+          <div class="action-row">
+            <button class="btn-sec" onclick="gerarMockup()"><i class="ti ti-refresh"></i> Nova versão</button>
+            <button class="btn-sec" onclick="novaFotoMockup()"><i class="ti ti-camera"></i> Outra foto</button>
+            <button class="btn-sec" onclick="exportarPNG()"><i class="ti ti-download"></i> Baixar PNG</button>
+          </div>
+          <div style="margin-top:8px">
+            <button class="btn-sec" style="width:100%" onclick="exportarSVG()"><i class="ti ti-vector"></i> Baixar logo em SVG</button>
+          </div>
+        </div>
+        <!-- ERROR -->
+        <div class="error-box" id="error-box" style="display:none">
+          <div class="error-icon"><i class="ti ti-alert-circle"></i></div>
+          <div class="error-msg" id="error-msg">Erro ao gerar o mockup.</div>
+          <button class="btn-retry" onclick="gerarMockup()"><i class="ti ti-refresh"></i> Tentar novamente</button>
         </div>
       </div>
-      <div class="fg"><div class="flabel">❤️ Interesses e personalidade</div><textarea id="p-desc" placeholder="Ex: adoro gatos, viagens e café. Sou designer e toco violão nas horas vagas..."></textarea></div>
     </div>
-    <button class="btn-gen" onclick="gerar('pessoa')">✦ Criar arte agora</button>
+    <button class="btn-gen" style="margin-top:1rem; background:var(--bg3); border:1px solid var(--border); background:none; border:1px solid var(--border2); color:var(--purple-l); font-size:13px; padding:11px;" onclick="goStep(1)">
+      <i class="ti ti-arrow-left"></i> Criar outro mockup
+    </button>
   </div>
 
-  <!-- LIVRE -->
-  <div id="sec-livre" class="sec">
-    <div class="card">
-      <div class="tpl-title">✨ Inspirações rápidas</div>
-      <div class="tpl-grid">
-        <div class="tpl-btn" onclick="applyL('cosmo')"><span class="tpl-icon">🌌</span>Cosmos</div>
-        <div class="tpl-btn" onclick="applyL('floresta')"><span class="tpl-icon">🌳</span>Floresta</div>
-        <div class="tpl-btn" onclick="applyL('geo')"><span class="tpl-icon">🔷</span>Geométrico</div>
-        <div class="tpl-btn" onclick="applyL('oceano')"><span class="tpl-icon">🌊</span>Oceano</div>
-        <div class="tpl-btn" onclick="applyL('neon')"><span class="tpl-icon">⚡</span>Neon urbano</div>
-        <div class="tpl-btn" onclick="applyL('mandala')"><span class="tpl-icon">🔮</span>Mandala</div>
-      </div>
-      <div class="fg"><div class="flabel">💡 Sua ideia criativa</div><textarea id="l-desc" style="height:90px" placeholder="Ex: uma raposa astronauta olhando para a terra, estilo aquarela, tons quentes e vibrantes..."></textarea></div>
-      <div class="fg"><div class="flabel">🔍 Abordagem</div>
-        <div class="chips">
-          <span class="chip on" id="ref-orig" onclick="setRef('original',this)">Criação original</span>
-          <span class="chip" id="ref-web" onclick="setRef('web',this)">Inspiração web</span>
-          <span class="chip" id="ref-both" onclick="setRef('ambos',this)">Híbrido</span>
-        </div>
-      </div>
-    </div>
-    <button class="btn-gen" onclick="gerar('livre')">✦ Criar arte agora</button>
+  <div class="footer">
+    Estúdio de Arte IA · Powered by <a href="https://anthropic.com" target="_blank">Claude AI</a> · Fotos por <a href="https://unsplash.com" target="_blank">Unsplash</a>
   </div>
-
-  <!-- RESULTADO -->
-  <div id="result-wrap" class="result-wrap" style="display:none">
-    <div class="result-bar">
-      <div class="result-bar-left"><span class="sdot" id="sdot"></span> Arte gerada pela IA</div>
-      <span class="rtag" id="rtag">Original</span>
-    </div>
-    <div id="result-inner">
-      <div class="loading-box" id="loading-box">
-        <div class="spin"></div>
-        <div class="load-txt" id="lmsg">A IA está criando sua arte...</div>
-        <div class="load-steps">
-          <div class="lstep pulse" id="ls0"></div><div class="lstep" id="ls1"></div>
-          <div class="lstep" id="ls2"></div><div class="lstep" id="ls3"></div>
-        </div>
-      </div>
-      <div class="output-box" id="output-box" style="display:none">
-        <div class="art-frame" id="art-frame"></div>
-        <div class="desc-box">
-          <div class="desc-box-label">✦ Sobre esta arte</div>
-          <p id="art-desc">...</p>
-        </div>
-        <div class="actions">
-          <button class="abtn" onclick="regenerar()">🔄 Nova versão</button>
-          <button class="abtn" id="copybtn" onclick="copiarSVG()">📋 Copiar SVG</button>
-          <button class="abtn" onclick="exportSVG()">⬇️ Baixar SVG</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- HISTÓRICO -->
-  <div class="hist-section">
-    <div class="hist-top">
-      <h2>🕐 Histórico de artes</h2>
-      <button class="hist-clr" onclick="limparHist()">🗑️ Limpar</button>
-    </div>
-    <div class="hist-grid" id="hist-grid">
-      <div class="empty-hist"><span>🎨</span>Suas artes aparecerão aqui</div>
-    </div>
-  </div>
-
-  <footer><p>✦ <strong>Estúdio de Arte com IA</strong> &nbsp;·&nbsp; Powered by Claude AI</p></footer>
-
-</div><!-- wrapper -->
-</div><!-- main-app -->
-
-<div class="toast" id="toast"></div>
+</div>
 
 <script>
-let mode='empresa', refMode='original', lastSvg='', stepTimer, stepIdx=0, hist=[];
-let API_KEY='';
+// ── CONFIG DOS CENÁRIOS ──
+const CENARIOS = [
+  { id:'fachada',    label:'Fachada de loja',       icon:'ti-door-enter',    query:'retail store front exterior', queryPT:'fachada loja' },
+  { id:'seguranca',  label:'Câmera de segurança',   icon:'ti-camera',        query:'security camera system cctv installation', queryPT:'câmera segurança' },
+  { id:'outdoor',    label:'Outdoor / Placa',        icon:'ti-sign-left',     query:'billboard outdoor advertisement urban', queryPT:'outdoor publicidade' },
+  { id:'escritorio', label:'Escritório',             icon:'ti-building-skyscraper', query:'modern office interior workspace', queryPT:'escritório moderno' },
+  { id:'cartao',     label:'Mesa / Cartão',          icon:'ti-id-badge',      query:'business card desk workspace minimal', queryPT:'mesa cartão visita' },
+  { id:'celular',    label:'Tela de app',            icon:'ti-device-mobile', query:'smartphone app screen hand', queryPT:'celular app' },
+  { id:'uniforme',   label:'Uniforme',               icon:'ti-shirt',         query:'work uniform employee professional', queryPT:'uniforme profissional' },
+  { id:'veiculo',    label:'Veículo / Frota',        icon:'ti-car',           query:'branded company car vehicle fleet wrap', queryPT:'carro empresa' },
+  { id:'restaurante',label:'Restaurante / Café',    icon:'ti-coffee',        query:'restaurant cafe interior ambiance', queryPT:'restaurante café' },
+];
 
-// ===== API KEY =====
-function toggleApiVis(){
-  const inp=document.getElementById('api-key-input');
-  inp.type=inp.type==='password'?'text':'password';
+// ── ESTADO ──
+let currentStep = 1;
+let selectedScenario = null;
+let fotoAtual = null;
+let lastSvg = '';
+let stepTimer;
+let stepIdx = 0;
+let isGenerating = false;
+let fotoSource = 'unsplash'; // 'unsplash' | 'google'
+let customQuery = '';
+
+// ── TROCA DE FONTE ──
+function setSource(src) {
+  fotoSource = src;
+  document.getElementById('src-unsplash').classList.toggle('active', src === 'unsplash');
+  document.getElementById('src-google').classList.toggle('active', src === 'google');
+  if (selectedScenario || customQuery) buscarFoto();
 }
 
-function entrarComKey(){
-  const key=document.getElementById('api-key-input').value.trim();
-  if(!key||!key.startsWith('sk-')){
-    document.getElementById('api-error').style.display='block';
+async function buscarFotoCustom() {
+  const val = document.getElementById('foto-query-custom').value.trim();
+  if (!val) return;
+  customQuery = val;
+  await buscarFoto();
+}
+
+// ── INICIALIZAÇÃO ──
+document.addEventListener('DOMContentLoaded', () => {
+  renderScenarios();
+});
+
+function renderScenarios() {
+  const grid = document.getElementById('scenario-grid');
+  grid.innerHTML = CENARIOS.map(c => `
+    <div class="scenario-card" id="sc-${c.id}" onclick="selectScenario('${c.id}')">
+      <div class="scenario-thumb" style="display:flex;align-items:center;justify-content:center;background:#1e1838">
+        <i class="ti ${c.icon}" style="font-size:28px;color:#5a5490"></i>
+      </div>
+      <div class="scenario-label">
+        <i class="ti ${c.icon}"></i> ${c.label}
+      </div>
+      <div class="scenario-check">✓</div>
+    </div>
+  `).join('');
+}
+
+// ── NAVEGAÇÃO POR PASSOS ──
+function goStep(n) {
+  // Validação passo 1
+  if (n > 1 && !document.getElementById('e-nome').value.trim()) {
+    document.getElementById('e-nome').focus();
+    document.getElementById('e-nome').style.borderColor = '#E24B4A';
+    setTimeout(() => document.getElementById('e-nome').style.borderColor = '', 2000);
     return;
   }
-  API_KEY=key;
-  document.getElementById('api-error').style.display='none';
-  document.getElementById('api-screen').style.display='none';
-  document.getElementById('main-app').style.display='block';
-  const preview=key.slice(0,14)+'...';
-  document.getElementById('key-preview').textContent=preview;
-  sessionStorage.setItem('arte_key',key);
+  // Validação passo 2
+  if (n > 2 && !selectedScenario) return;
+
+  currentStep = n;
+
+  document.querySelectorAll('.passo').forEach((p, i) => {
+    p.style.display = (i + 1 === n) ? 'block' : 'none';
+  });
+
+  document.querySelectorAll('.step').forEach((s, i) => {
+    s.classList.toggle('active', i + 1 === n);
+    s.classList.toggle('done', i + 1 < n);
+  });
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function trocarKey(){
-  API_KEY='';
-  sessionStorage.removeItem('arte_key');
-  document.getElementById('api-key-input').value='';
-  document.getElementById('api-screen').style.display='flex';
-  document.getElementById('main-app').style.display='none';
+// ── SELECIONAR CENÁRIO ──
+async function selectScenario(id) {
+  selectedScenario = CENARIOS.find(c => c.id === id);
+  document.querySelectorAll('.scenario-card').forEach(c => c.classList.remove('active'));
+  document.getElementById('sc-' + id).classList.add('active');
+  document.getElementById('btn-step2').disabled = false;
+  document.getElementById('foto-wrap').style.display = 'block';
+  await buscarFoto();
 }
 
-// Restaurar chave da sessão
-window.addEventListener('load',()=>{
-  const saved=sessionStorage.getItem('arte_key');
-  if(saved&&saved.startsWith('sk-')){
-    API_KEY=saved;
-    document.getElementById('api-screen').style.display='none';
-    document.getElementById('main-app').style.display='block';
-    document.getElementById('key-preview').textContent=saved.slice(0,14)+'...';
-  }
-  renderHist();
-});
+// ── BUSCAR FOTO (Unsplash ou Google) ──
+async function buscarFoto() {
+  if (!selectedScenario && !customQuery) return;
+  const preview = document.getElementById('foto-preview');
+  preview.style.opacity = '0.5';
 
-document.getElementById('api-key-input').addEventListener('keydown',e=>{
-  if(e.key==='Enter')entrarComKey();
-});
+  // Determina a query: busca personalizada tem prioridade
+  const q = customQuery || selectedScenario?.query || 'business';
+  const endpoint = fotoSource === 'google'
+    ? `/api/foto/google?q=${encodeURIComponent(q)}`
+    : `/api/foto/unsplash?q=${encodeURIComponent(q)}`;
 
-// ===== TEMPLATES =====
-const tplsE={
-  tech:{nome:'NovaTech',setor:'Tecnologia',tipo:'Logo / Identidade visual',estilos:['Moderno','Futurista'],cor:'azul',extra:'Startup de IA inovadora para o futuro'},
-  food:{nome:'Café Aurora',setor:'Alimentação',tipo:'Logo / Identidade visual',estilos:['Orgânico','Elegante'],cor:'âmbar',extra:'Café artesanal aconchegante e sofisticado'},
-  saude:{nome:'VitaClinic',setor:'Saúde',tipo:'Logo / Identidade visual',estilos:['Moderno','Minimalista'],cor:'verde',extra:'Clínica moderna e humanizada'},
-  moda:{nome:'Voga Studio',setor:'Moda',tipo:'Capa de perfil',estilos:['Elegante','Bold'],cor:'rosa',extra:'Moda contemporânea e sustentável'},
-  edu:{nome:'LearnUp',setor:'Educação',tipo:'Banner redes sociais',estilos:['Criativo','Moderno'],cor:'roxo',extra:'Plataforma de ensino online interativo'},
-  fin:{nome:'WealthGrow',setor:'Finanças',tipo:'Logo / Identidade visual',estilos:['Corporativo','Elegante'],cor:'preto',extra:'Gestão de investimentos premium'}
-};
-const tplsP={
-  musico:{nome:'DJ Volt',tipo:'Capa de rede social',estilo:'Arte abstrata',desc:'músico eletrônico, amo beats e energia urbana, shows noturnos'},
-  designer:{nome:'Ana Designs',tipo:'Foto de perfil artística',estilo:'Flat design',desc:'designer gráfica, minimalista, tipografia e cores vibrantes'},
-  atleta:{nome:'Rodrigo Run',tipo:'Cartão pessoal',estilo:'Geométrico',desc:'corredor de maratona, disciplina, velocidade e superação'},
-  chef:{nome:'Chef Lia',tipo:'Capa de rede social',estilo:'Ilustração digital',desc:'chef de cozinha italiana, paixão por sabores e aromas'},
-  dev:{nome:'CodeMaster',tipo:'Foto de perfil artística',estilo:'Geométrico',desc:'desenvolvedor fullstack, fã de terminal e café forte'},
-  foto:{nome:'Lens & Soul',tipo:'Capa de rede social',estilo:'Arte abstrata',desc:'fotógrafo de natureza, luz natural e momentos únicos'}
-};
-const tplsL={
-  cosmo:'Um cosmos vibrante com nebulosas coloridas, planetas geométricos e estrelas cintilantes, estilo sci-fi artístico',
-  floresta:'Uma floresta encantada com árvores luminosas, cogumelos mágicos e raios de luz entre as folhas, estilo fantasia',
-  geo:'Composição geométrica abstrata com hexágonos, triângulos e círculos em tons de roxo, coral e teal, estilo moderno',
-  oceano:'Oceano profundo com ondas estilizadas, criaturas marinhas bioluminescentes e coral colorido, estilo aquarela',
-  neon:'Cidade futurista à noite com arranha-céus, luzes neon refletidas na chuva e silhuetas urbanas, estilo cyberpunk',
-  mandala:'Mandala intrincada com padrões simétricos florais e geométricos em tons dourados e violeta, estilo decorativo'
-};
+  try {
+    const res = await fetch(endpoint);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
 
-function applyE(k){
-  const t=tplsE[k];
-  document.getElementById('e-nome').value=t.nome;
-  document.getElementById('e-setor').value=t.setor;
-  document.getElementById('e-tipo').value=t.tipo;
-  document.getElementById('e-extra').value=t.extra;
-  document.querySelectorAll('#e-estilos .chip').forEach(c=>c.classList.toggle('on',t.estilos.includes(c.textContent.trim())));
-  document.querySelectorAll('#e-cores .cp').forEach(c=>c.classList.toggle('on',c.dataset.n===t.cor));
-}
-function applyP(k){const t=tplsP[k];document.getElementById('p-nome').value=t.nome;document.getElementById('p-tipo').value=t.tipo;document.getElementById('p-estilo').value=t.estilo;document.getElementById('p-desc').value=t.desc;}
-function applyL(k){document.getElementById('l-desc').value=tplsL[k];}
+    fotoAtual = data;
+    document.getElementById('foto-img').src = data.thumb || data.url;
 
-// ===== UI =====
-function setMode(m,el){
-  mode=m;
-  document.querySelectorAll('.mtab').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
-  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
-  document.getElementById('sec-'+m).classList.add('active');
-}
-function setRef(r,el){
-  refMode=r;
-  document.getElementById('ref-orig').classList.toggle('on',r==='original');
-  document.getElementById('ref-web').classList.toggle('on',r==='web');
-  document.getElementById('ref-both').classList.toggle('on',r==='ambos');
-}
-function pickC(el,grp){
-  document.querySelectorAll('#'+grp+' .cp').forEach(c=>c.classList.remove('on'));
-  el.classList.add('on');
-}
-function getChips(id){return Array.from(document.querySelectorAll('#'+id+' .chip.on')).map(c=>c.textContent.trim()).join(', ');}
-
-// ===== PROMPT =====
-function buildPrompt(){
-  if(mode==='empresa'){
-    const nome=document.getElementById('e-nome').value||'Minha Empresa';
-    const setor=document.getElementById('e-setor').value;
-    const tipo=document.getElementById('e-tipo').value;
-    const estilos=getChips('e-estilos')||'moderno';
-    const cor=document.querySelector('#e-cores .cp.on')?.dataset.n||'roxo';
-    const extra=document.getElementById('e-extra').value;
-    return `Crie um SVG profissional e visualmente impactante de 500x300px para a empresa "${nome}" do setor ${setor}. Tipo: ${tipo}. Estilo: ${estilos}. Cor principal: ${cor}. ${extra?'Detalhes: '+extra+'.':''} Use formas geométricas criativas, tipografia limpa com o nome da empresa, ícone representativo. Paleta harmoniosa e profissional. Retorne APENAS o código SVG completo.`;
-  }
-  if(mode==='pessoa'){
-    const nome=document.getElementById('p-nome').value||'Artista';
-    const tipo=document.getElementById('p-tipo').value;
-    const estilo=document.getElementById('p-estilo').value;
-    const desc=document.getElementById('p-desc').value;
-    return `Crie um SVG artístico de 400x400px para "${nome}". Tipo: ${tipo}. Estilo: ${estilo}. ${desc?'Sobre: '+desc:''} Composição criativa, tipografia expressiva, elementos que reflitam a personalidade. Retorne APENAS o SVG completo.`;
-  }
-  const desc=document.getElementById('l-desc').value||'arte abstrata vibrante';
-  const extra=refMode==='web'?' Inspire-se em estilos do Behance e Dribbble.':refMode==='ambos'?' Combine referências modernas com criatividade própria.':'';
-  return `Crie um SVG artístico de 500x340px sobre: "${desc}".${extra} Composição expressiva, cores vibrantes, formas dinâmicas. Retorne APENAS o SVG completo.`;
-}
-
-function startLoader(){
-  stepIdx=0;
-  const msgs=['A IA está criando sua arte...','Compondo formas e cores...','Refinando cada detalhe...','Finalizando a obra...'];
-  document.getElementById('lmsg').textContent=msgs[0];
-  clearInterval(stepTimer);
-  stepTimer=setInterval(()=>{
-    [0,1,2,3].forEach(i=>document.getElementById('ls'+i).classList.toggle('pulse',i===stepIdx%4));
-    stepIdx++;
-    document.getElementById('lmsg').textContent=msgs[stepIdx%msgs.length];
-  },1700);
-}
-
-function getNome(){
-  if(mode==='empresa')return document.getElementById('e-nome').value||'Empresa';
-  if(mode==='pessoa')return document.getElementById('p-nome').value||'Pessoal';
-  return (document.getElementById('l-desc').value||'Arte livre').slice(0,22);
-}
-
-// ===== GERAR =====
-async function gerar(m){
-  mode=m;
-  if(!API_KEY){showToast('❌ Insira sua API Key primeiro!');return;}
-  document.getElementById('result-wrap').style.display='block';
-  document.getElementById('loading-box').style.display='block';
-  document.getElementById('output-box').style.display='none';
-  document.getElementById('sdot').style.background='#EF9F27';
-  document.getElementById('rtag').textContent=refMode==='web'?'Com referências':refMode==='ambos'?'Híbrido':'Original';
-  startLoader();
-  document.getElementById('result-wrap').scrollIntoView({behavior:'smooth',block:'start'});
-
-  const prompt=buildPrompt()+'\n\nDepois do SVG, escreva "===DESC===" e então 2 frases em português descrevendo as escolhas criativas da arte.';
-
-  try{
-    const res=await fetch('/api/generate',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':API_KEY},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,messages:[{role:'user',content:prompt}]})
-    });
-    const data=await res.json();
-    clearInterval(stepTimer);
-
-    if(data.error){
-      document.getElementById('lmsg').textContent='❌ '+( data.error.message||'Erro na API');
-      document.getElementById('sdot').style.background='#E24B4A';
-      if(data.error.type==='authentication_error')showToast('❌ Chave inválida. Verifique sua API Key.');
-      return;
+    const link = document.getElementById('foto-credit-link');
+    const sourceLabel = document.getElementById('foto-source-label');
+    if (fotoSource === 'google') {
+      sourceLabel.textContent = '🔍 Via Google ·';
+      link.textContent = data.credit || 'Google Images';
+      link.href = data.creditLink || '#';
+    } else {
+      sourceLabel.textContent = '📷 Foto por';
+      link.textContent = data.credit || 'Unsplash';
+      link.href = (data.creditLink || 'https://unsplash.com') + '?utm_source=estudio_arte_ia&utm_medium=referral';
     }
 
-    const full=data.content.map(b=>b.text||'').join('');
-    const parts=full.split('===DESC===');
-    let raw=parts[0].trim();
-    const desc=parts[1]?parts[1].trim():'Arte criada com sucesso!';
-    const match=raw.match(/<svg[\s\S]*<\/svg>/i);
-    if(match)raw=match[0];
-    lastSvg=raw;
+    preview.style.opacity = '1';
 
-    const frame=document.getElementById('art-frame');
-    frame.innerHTML=raw;
-    const svgEl=frame.querySelector('svg');
-    if(svgEl){svgEl.style.maxWidth='100%';svgEl.style.height='auto';}
-    document.getElementById('art-desc').textContent=desc;
-    document.getElementById('sdot').style.background='#1D9E75';
-    document.getElementById('loading-box').style.display='none';
-    document.getElementById('output-box').style.display='block';
-    addHist(raw,getNome());
-
-  }catch(e){
-    clearInterval(stepTimer);
-    document.getElementById('lmsg').textContent='❌ Erro de conexão. Tente novamente.';
-    document.getElementById('sdot').style.background='#E24B4A';
-    console.error(e);
+    // Atualizar thumb do cenário selecionado
+    if (selectedScenario) {
+      const thumb = document.querySelector(`#sc-${selectedScenario.id} .scenario-thumb`);
+      if (thumb) {
+        thumb.style.backgroundImage = `url(${data.thumb || data.url})`;
+        thumb.style.backgroundSize = 'cover';
+        thumb.style.backgroundPosition = 'center';
+        thumb.innerHTML = '';
+      }
+    }
+  } catch (e) {
+    console.error('Erro foto:', e);
+    preview.style.opacity = '1';
+    // Mostra erro inline
+    document.getElementById('foto-img').alt = '⚠️ ' + e.message;
   }
 }
 
-function regenerar(){gerar(mode);}
+// ── HELPERS ──
+function pickColor(el) {
+  document.querySelectorAll('#e-cores .cpick').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+}
 
-// ===== HISTÓRICO =====
-function addHist(svg,nome){
-  const now=new Date();
-  const time=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
-  hist.unshift({svg,nome,time});
-  if(hist.length>9)hist.pop();
-  renderHist();
+function getChips(id) {
+  return Array.from(document.querySelectorAll('#' + id + ' .chip.on'))
+    .map(c => c.textContent.trim()).join(', ');
 }
-function renderHist(){
-  const g=document.getElementById('hist-grid');
-  if(!hist.length){g.innerHTML='<div class="empty-hist"><span>🎨</span>Suas artes aparecerão aqui</div>';return;}
-  g.innerHTML=hist.map((h,i)=>`
-    <div class="hist-card" onclick="loadHist(${i})">
-      <div class="hist-thumb">${h.svg}</div>
-      <div class="hist-meta"><div class="hist-name">${h.nome}</div><div class="hist-time">⏱ ${h.time}</div></div>
-    </div>`).join('');
-  document.querySelectorAll('.hist-thumb svg').forEach(s=>{s.style.maxWidth='100%';s.style.height='auto';});
-}
-function loadHist(i){
-  const h=hist[i];lastSvg=h.svg;
-  document.getElementById('result-wrap').style.display='block';
-  document.getElementById('loading-box').style.display='none';
-  document.getElementById('output-box').style.display='block';
-  const frame=document.getElementById('art-frame');
-  frame.innerHTML=h.svg;
-  const svg=frame.querySelector('svg');
-  if(svg){svg.style.maxWidth='100%';svg.style.height='auto';}
-  document.getElementById('art-desc').textContent='Arte carregada do histórico. Clique em "Nova versão" para regenerar.';
-  document.getElementById('sdot').style.background='#1D9E75';
-  document.getElementById('result-wrap').scrollIntoView({behavior:'smooth',block:'start'});
-}
-function limparHist(){hist=[];renderHist();}
 
-// ===== AÇÕES =====
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2500);
+// ── LOADER ──
+const LOAD_MSGS = [
+  'Buscando foto do cenário...',
+  'A IA está criando o logo...',
+  'Compondo formas e cores...',
+  'Montando o mockup final...'
+];
+
+function startLoader(msg) {
+  stepIdx = 0;
+  document.getElementById('lmsg').textContent = msg || LOAD_MSGS[0];
+  clearInterval(stepTimer);
+  stepTimer = setInterval(() => {
+    document.querySelectorAll('.lstep').forEach((el, i) => {
+      el.classList.toggle('pulse', i === stepIdx % 4);
+    });
+    stepIdx++;
+    document.getElementById('lmsg').textContent = LOAD_MSGS[stepIdx % LOAD_MSGS.length];
+  }, 1800);
 }
-async function copiarSVG(){
-  if(!lastSvg)return;
-  try{
-    await navigator.clipboard.writeText(lastSvg);
-    const btn=document.getElementById('copybtn');
-    btn.classList.add('ok');btn.textContent='✓ Copiado!';
-    setTimeout(()=>{btn.classList.remove('ok');btn.textContent='📋 Copiar SVG';},2000);
-    showToast('✓ SVG copiado!');
-  }catch(e){console.error(e);}
+
+function stopLoader() { clearInterval(stepTimer); }
+
+// ── GERAR MOCKUP ──
+async function gerarMockup() {
+  if (isGenerating) return;
+  isGenerating = true;
+
+  goStep(4);
+
+  const dot = document.getElementById('sdot');
+  dot.className = 'sdot';
+  document.getElementById('result-label').textContent = 'Gerando mockup...';
+  document.getElementById('rtag').textContent = selectedScenario?.label || '–';
+  document.getElementById('loading-box').style.display = 'block';
+  document.getElementById('output-box').style.display = 'none';
+  document.getElementById('error-box').style.display = 'none';
+
+  startLoader();
+
+  try {
+    // 1. Buscar foto se não tiver
+    if (!fotoAtual) await buscarFoto();
+
+    // 2. Gerar logo com IA
+    const nome    = document.getElementById('e-nome').value || 'Minha Empresa';
+    const setor   = document.getElementById('e-setor').value;
+    const slogan  = document.getElementById('e-slogan').value;
+    const estilos = getChips('e-estilos') || 'moderno';
+    const cor     = document.querySelector('#e-cores .cpick.on')?.dataset.name || 'roxo';
+    const tipo    = document.getElementById('e-tipo').value;
+    const extra   = document.getElementById('e-extra').value;
+    const cenario = selectedScenario?.label || 'ambiente profissional';
+
+    const prompt = `Você é um designer gráfico especialista em identidade visual.
+Crie um SVG profissional de logo/arte para a empresa "${nome}" no setor de ${setor}.
+${slogan ? 'Slogan: ' + slogan + '.' : ''}
+Tipo de arte: ${tipo}. Estilo: ${estilos}. Cor principal: ${cor}.
+Contexto de aplicação: será exibido em mockup de ${cenario}.
+${extra ? 'Detalhes adicionais: ' + extra + '.' : ''}
+
+INSTRUÇÕES TÉCNICAS:
+- Dimensões: 500x300px com viewBox="0 0 500 300"
+- Fundo: transparente (sem <rect> de fundo sólido cobrindo tudo) ou semi-transparente escuro
+- Nome da empresa em destaque, legível, em fonte limpa
+- Símbolo/ícone representativo do setor
+- Alta qualidade visual, profissional
+- Funciona bem sobre foto de fundo (use cores que contrastem)
+
+Retorne APENAS o código SVG completo. Nada antes, nada depois.
+Depois do SVG, escreva exatamente "===DESC===" e 2 frases descrevendo as escolhas criativas em português.`;
+
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await res.json();
+    stopLoader();
+
+    if (!res.ok || data.error) throw new Error(data.error?.message || 'Erro da API de IA');
+
+    const full = data.content.map(b => b.text || '').join('');
+    const parts = full.split('===DESC===');
+    let raw = parts[0].trim();
+    const desc = parts[1]?.trim() || 'Arte criada com sucesso!';
+
+    const svgMatch = raw.match(/<svg[\s\S]*?<\/svg>/i);
+    if (svgMatch) raw = svgMatch[0];
+    if (!raw.includes('<svg')) throw new Error('A IA não retornou um SVG válido. Tente novamente.');
+
+    lastSvg = raw;
+
+    // 3. Montar mockup
+    const bgEl = document.getElementById('mockup-bg');
+    bgEl.src = fotoAtual?.url || fotoAtual?.thumb || '';
+    bgEl.alt = cenario;
+
+    const canvas = document.getElementById('svg-canvas');
+    canvas.innerHTML = raw;
+    const svgEl = canvas.querySelector('svg');
+    if (svgEl) {
+      svgEl.style.maxWidth = '100%';
+      svgEl.style.height = 'auto';
+    }
+
+    // Crédito foto
+    if (fotoAtual?.credit) {
+      document.getElementById('mockup-badge').textContent = `📸 ${fotoAtual.credit} · Unsplash`;
+    }
+
+    document.getElementById('art-desc').textContent = desc;
+    dot.className = 'sdot ok';
+    document.getElementById('result-label').textContent = 'Mockup criado!';
+    document.getElementById('loading-box').style.display = 'none';
+    document.getElementById('output-box').style.display = 'block';
+
+  } catch (e) {
+    stopLoader();
+    dot.className = 'sdot err';
+    document.getElementById('result-label').textContent = 'Erro';
+    document.getElementById('error-msg').textContent = e.message || 'Erro desconhecido.';
+    document.getElementById('loading-box').style.display = 'none';
+    document.getElementById('error-box').style.display = 'block';
+    console.error(e);
+  } finally {
+    isGenerating = false;
+  }
 }
-function exportSVG(){
-  if(!lastSvg)return;
-  const blob=new Blob([lastSvg],{type:'image/svg+xml'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;a.download='arte-ia.svg';a.click();
+
+// ── NOVA FOTO NO MOCKUP (sem regerar logo) ──
+async function novaFotoMockup() {
+  await buscarFoto();
+  if (fotoAtual) {
+    document.getElementById('mockup-bg').src = fotoAtual.url || fotoAtual.thumb;
+    if (fotoAtual.credit) {
+      document.getElementById('mockup-badge').textContent = `📸 ${fotoAtual.credit} · Unsplash`;
+    }
+  }
+}
+
+// ── EXPORTAR SVG ──
+function exportarSVG() {
+  if (!lastSvg) return;
+  const blob = new Blob([lastSvg], { type: 'image/svg+xml' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const nome = (document.getElementById('e-nome')?.value || 'logo').toLowerCase().replace(/\s+/g, '-');
+  a.href = url; a.download = nome + '-logo.svg'; a.click();
   URL.revokeObjectURL(url);
-  showToast('⬇️ Download iniciado!');
+}
+
+// ── EXPORTAR PNG (canvas) ──
+async function exportarPNG() {
+  const mockupWrap = document.querySelector('.mockup-wrap');
+  if (!mockupWrap) return;
+
+  // Usa html2canvas se disponível, senão faz via canvas manual
+  try {
+    const canvas = document.createElement('canvas');
+    const bg = document.getElementById('mockup-bg');
+    canvas.width = 800; canvas.height = 450;
+    const ctx = canvas.getContext('2d');
+
+    // Fundo foto
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0, 800, 450);
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.fillRect(0, 0, 800, 450);
+
+      // SVG sobre a foto
+      const svgData = new XMLSerializer().serializeToString(document.querySelector('#svg-canvas svg'));
+      const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(svgBlob);
+      const svgImg = new Image();
+      svgImg.onload = () => {
+        const sw = Math.min(400, svgImg.width);
+        const sh = (svgImg.height / svgImg.width) * sw;
+        ctx.drawImage(svgImg, (800 - sw) / 2, (450 - sh) / 2, sw, sh);
+        URL.revokeObjectURL(url);
+
+        const a = document.createElement('a');
+        const nome = (document.getElementById('e-nome')?.value || 'mockup').toLowerCase().replace(/\s+/g, '-');
+        a.download = nome + '-mockup.png';
+        a.href = canvas.toDataURL('image/png');
+        a.click();
+      };
+      svgImg.src = url;
+    };
+    img.onerror = () => {
+      alert('Não foi possível exportar o PNG (CORS da imagem). Tente outra foto ou use o SVG.');
+    };
+    img.src = bg.src;
+  } catch (e) {
+    console.error('Erro exportar PNG:', e);
+    alert('Erro ao exportar. Use o botão SVG.');
+  }
 }
 </script>
 </body>
