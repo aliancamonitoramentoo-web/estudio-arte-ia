@@ -1,7 +1,7 @@
 {
   "name": "estudio-arte-ia",
-  "version": "1.0.0",
-  "description": "Estúdio de Arte com Inteligência Artificial",
+  "version": "2.0.0",
+  "description": "Estúdio de Arte IA — Mockups realistas com Claude + Unsplash",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

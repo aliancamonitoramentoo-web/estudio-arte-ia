@@ -1,0 +1,16 @@
+# ── OBRIGATÓRIO ──
+ANTHROPIC_API_KEY=sk-ant-...
+
+# ── BANCO DE IMAGENS (configure pelo menos um) ──
+
+# Unsplash — cenários gerais (fachadas, escritórios, outdoors...)
+# Cadastro grátis em: https://unsplash.com/developers
+UNSPLASH_ACCESS_KEY=sua-chave-unsplash
+
+# Google Custom Search — produtos de marca (câmeras, equipamentos...)
+# Passo 1: Chave em https://console.cloud.google.com → APIs → Custom Search JSON API
+# Passo 2: CX em https://programmablesearchengine.google.com → Criar mecanismo
+GOOGLE_API_KEY=sua-chave-google
+GOOGLE_CX=seu-cx-google
+
+PORT=3000

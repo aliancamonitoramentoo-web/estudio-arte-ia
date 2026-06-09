@@ -63,16 +63,19 @@ app.get('/api/foto/google', async (req, res) => {
   }
 
   const query = req.query.q || 'security camera';
-  const start = Math.floor(Math.random() * 8) + 1;
+  const start = Math.floor(Math.random() * 8) + 1; // aleatoriza resultados
   const url = `https://www.googleapis.com/customsearch/v1?key=${googleKey}&cx=${googleCX}&q=${encodeURIComponent(query)}&searchType=image&num=5&start=${start}&safe=active&imgSize=large`;
 
   try {
     const response = await fetch(url);
     const data = await response.json();
+
     if (data.error) return res.status(400).json({ error: data.error.message });
     if (!data.items || data.items.length === 0) {
-      return res.status(404).json({ error: 'Nenhuma imagem encontrada.' });
+      return res.status(404).json({ error: 'Nenhuma imagem encontrada para esta busca.' });
     }
+
+    // Pega um resultado aleatório dos 5 retornados
     const item = data.items[Math.floor(Math.random() * data.items.length)];
     res.json({
       url: item.link,
@@ -87,6 +90,7 @@ app.get('/api/foto/google', async (req, res) => {
   }
 });
 
+// ── ROTA LEGACY (mantém compatibilidade) ──
 app.get('/api/foto', async (req, res) => {
   res.redirect('/api/foto/unsplash?' + new URLSearchParams(req.query).toString());
 });
@@ -96,5 +100,5 @@ app.get('*', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🎨 Estúdio de Arte IA rodando em http://localhost:${PORT}`);
+  console.log(`🎨 Estúdio de Arte IA v2 rodando em http://localhost:${PORT}`);
 });
