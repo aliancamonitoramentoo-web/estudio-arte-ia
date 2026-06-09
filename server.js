@@ -84,6 +84,56 @@ app.get('/api/foto', async (req, res) => {
   res.redirect('/api/foto/unsplash?' + new URLSearchParams(req.query).toString());
 });
 
+// ── BUSCA DE LOGO DA EMPRESA ──
+// Tenta Clearbit → Google → retorna null se não achar
+app.get('/api/logo', async (req, res) => {
+  const nome = req.query.nome || '';
+  const dominio = req.query.dominio || '';
+
+  // Lista de domínios para tentar (do mais específico ao genérico)
+  const candidatos = [];
+  if (dominio) candidatos.push(dominio);
+
+  // Tenta adivinhar o domínio pelo nome da empresa
+  const slug = nome.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '');
+
+  const sufixos = ['.com.br', '.com', '.net.br', '.net'];
+  for (const s of sufixos) candidatos.push(slug + s);
+
+  // Tenta cada candidato no Clearbit
+  for (const d of candidatos.slice(0, 4)) {
+    try {
+      const url = `https://logo.clearbit.com/${d}?size=400&format=png`;
+      const r = await fetch(url, { redirect: 'follow' });
+      if (r.ok && r.headers.get('content-type')?.includes('image')) {
+        // Retorna a URL diretamente (PNG transparente)
+        return res.json({ url, dominio: d, source: 'clearbit', found: true });
+      }
+    } catch(e) {}
+  }
+
+  // Fallback: tenta Google Images para logo PNG
+  const googleKey = process.env.GOOGLE_API_KEY;
+  const googleCX  = process.env.GOOGLE_CX;
+  if (googleKey && googleCX) {
+    try {
+      const q = `${nome} logo PNG transparent official`;
+      const url = `https://www.googleapis.com/customsearch/v1?key=${googleKey}&cx=${googleCX}&q=${encodeURIComponent(q)}&searchType=image&num=5&safe=active&imgType=clipart&fileType=png`;
+      const r = await fetch(url);
+      const d = await r.json();
+      if (d.items?.length) {
+        const item = d.items[0];
+        return res.json({ url: item.link, thumb: item.image?.thumbnailLink, source: 'google', found: true });
+      }
+    } catch(e) {}
+  }
+
+  // Não achou — retorna found: false para o frontend pedir upload ou gerar com IA
+  res.json({ found: false, message: 'Logo não encontrada automaticamente.' });
+});
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
