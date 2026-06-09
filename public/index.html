@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Estúdio de Arte com IA</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0D0B14;--surface:#16121F;--surface2:#1E1929;
+  --border:#2E2840;--border2:#3D3558;
+  --purple:#7F77DD;--purple-light:#AFA9EC;--purple-dark:#534AB7;
+  --coral:#D85A30;--teal:#1D9E75;--amber:#EF9F27;--pink:#D4537E;
+  --red:#E24B4A;
+  --text:#F0EDF8;--text2:#9B94B8;--text3:#5E5880;
+  --radius:14px;--radius-sm:9px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(127,119,221,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(127,119,221,0.04) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;}
+.orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0}
+.orb1{width:500px;height:500px;background:rgba(127,119,221,0.12);top:-150px;right:-100px}
+.orb2{width:400px;height:400px;background:rgba(216,90,48,0.08);bottom:-100px;left:-80px}
+.orb3{width:300px;height:300px;background:rgba(29,158,117,0.07);top:40%;left:40%}
+
+/* ===== API KEY SCREEN ===== */
+#api-screen{
+  position:fixed;inset:0;z-index:100;
+  display:flex;align-items:center;justify-content:center;
+  background:#0D0B14;padding:1.5rem;
+}
+.api-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:20px;padding:2.5rem 2rem;
+  max-width:440px;width:100%;text-align:center;
+  position:relative;z-index:1;
+}
+.api-logo{font-size:48px;margin-bottom:1rem;display:block}
+.api-card h2{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:.5rem;background:linear-gradient(135deg,#fff 30%,var(--purple-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.api-card p{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:1.5rem}
+.api-input-wrap{position:relative;margin-bottom:1rem}
+.api-input-wrap input{
+  width:100%;padding:12px 44px 12px 14px;
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);color:var(--text);font-size:14px;
+  font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s;
+  letter-spacing:.05em;
+}
+.api-input-wrap input:focus{border-color:var(--purple)}
+.eye-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);font-size:18px;padding:2px;}
+.api-btn{
+  width:100%;padding:13px;font-size:15px;font-family:'Syne',sans-serif;font-weight:700;
+  border-radius:var(--radius-sm);cursor:pointer;border:none;
+  background:linear-gradient(135deg,var(--purple-dark),var(--coral));
+  color:#fff;transition:opacity .2s;
+}
+.api-btn:hover{opacity:.88}
+.api-hint{font-size:12px;color:var(--text3);margin-top:.75rem;line-height:1.5}
+.api-hint a{color:var(--purple-light);text-decoration:none}
+.api-hint a:hover{text-decoration:underline}
+.api-error{font-size:12px;color:#F09595;margin-top:.5rem;display:none}
+
+/* ===== MAIN APP ===== */
+#main-app{display:none;position:relative;z-index:1}
+.wrapper{max-width:720px;margin:0 auto;padding:2rem 1.25rem 4rem;position:relative;z-index:1;}
+
+/* TOPBAR */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:2rem;padding-bottom:1rem;
+  border-bottom:1px solid var(--border);
+}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.topbar-logo{font-size:22px}
+.topbar-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--text)}
+.topbar-sub{font-size:11px;color:var(--text3)}
+.key-badge{
+  display:flex;align-items:center;gap:6px;
+  padding:5px 12px;border-radius:30px;font-size:12px;
+  background:rgba(29,158,117,0.1);border:1px solid rgba(29,158,117,0.25);
+  color:#5DCAA5;cursor:pointer;transition:all .15s;
+}
+.key-badge:hover{background:rgba(226,75,74,0.1);border-color:rgba(226,75,74,0.25);color:#F09595}
+
+/* HEADER */
+header{text-align:center;padding:1rem 0 2rem}
+.logo-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:30px;background:rgba(127,119,221,0.12);border:1px solid rgba(127,119,221,0.3);font-size:12px;font-weight:500;color:var(--purple-light);margin-bottom:1.25rem;letter-spacing:.04em;text-transform:uppercase;}
+.logo-dot{width:6px;height:6px;border-radius:50%;background:var(--purple);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+header h1{font-family:'Syne',sans-serif;font-size:clamp(26px,5vw,42px);font-weight:800;line-height:1.1;background:linear-gradient(135deg,#fff 30%,var(--purple-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.75rem;}
+header p{font-size:15px;color:var(--text2);max-width:420px;margin:0 auto 1.5rem;line-height:1.6}
+.header-pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.pill{display:flex;align-items:center;gap:5px;padding:5px 13px;border-radius:30px;font-size:12px;font-weight:500;border:1px solid;}
+.pill-p{background:rgba(127,119,221,0.1);border-color:rgba(127,119,221,0.25);color:#AFA9EC}
+.pill-c{background:rgba(216,90,48,0.1);border-color:rgba(216,90,48,0.25);color:#F0997B}
+.pill-t{background:rgba(29,158,117,0.1);border-color:rgba(29,158,117,0.25);color:#5DCAA5}
+.pill-a{background:rgba(239,159,39,0.1);border-color:rgba(239,159,39,0.25);color:#FAC775}
+.pill-k{background:rgba(212,83,126,0.1);border-color:rgba(212,83,126,0.25);color:#ED93B1}
+
+/* MODES */
+.mode-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem;}
+.mtab{padding:14px 10px;border-radius:var(--radius);cursor:pointer;border:1px solid var(--border);background:var(--surface);text-align:center;transition:all .2s;}
+.mtab:hover{border-color:var(--border2);background:var(--surface2)}
+.mtab.active{border:1.5px solid var(--purple);background:rgba(127,119,221,0.1);}
+.mtab-icon{font-size:22px;display:block;margin-bottom:5px}
+.mtab-label{font-family:'Syne',sans-serif;font-size:13px;font-weight:600;display:block;color:var(--text)}
+.mtab-sub{font-size:11px;color:var(--text3);display:block;margin-top:2px}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.4rem;margin-bottom:1rem;}
+.tpl-title{font-size:12px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.6rem}
+.tpl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:1.1rem}
+.tpl-btn{padding:9px 8px;border-radius:var(--radius-sm);cursor:pointer;border:1px solid var(--border);background:var(--surface2);font-size:12px;color:var(--text2);text-align:center;transition:all .15s;}
+.tpl-btn:hover{border-color:var(--purple);color:var(--purple-light);background:rgba(127,119,221,0.08)}
+.tpl-icon{font-size:17px;display:block;margin-bottom:3px}
+.fg{margin-bottom:.9rem}.fg:last-child{margin-bottom:0}
+.flabel{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;}
+input,textarea,select{width:100%;padding:10px 13px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s;-webkit-appearance:none;}
+input:focus,textarea:focus,select:focus{border-color:var(--purple)}
+select option{background:var(--surface2)}
+textarea{height:72px;resize:vertical}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:5px 13px;border-radius:30px;font-size:12px;font-weight:500;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;}
+.chip:hover{border-color:var(--purple);color:var(--purple-light)}
+.chip.on{background:rgba(127,119,221,0.15);border-color:var(--purple);color:var(--purple-light);}
+.cp-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.cp{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s;position:relative;}
+.cp.on{border-color:#fff;transform:scale(1.15)}
+.cp.on::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:700;}
+.sec{display:none}.sec.active{display:block}
+
+/* BTN GEN */
+.btn-gen{width:100%;padding:15px;font-size:16px;font-family:'Syne',sans-serif;font-weight:700;border-radius:var(--radius);cursor:pointer;border:none;background:linear-gradient(135deg,var(--purple-dark),var(--coral));color:#fff;letter-spacing:.02em;position:relative;overflow:hidden;transition:opacity .2s,transform .15s;}
+.btn-gen::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.08),transparent);pointer-events:none;}
+.btn-gen:hover{opacity:.88}
+.btn-gen:active{transform:scale(.99);opacity:.75}
+
+/* RESULT */
+.result-wrap{margin-top:1.5rem;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);background:var(--surface);}
+.result-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:linear-gradient(135deg,#1a0f2e,#1E1929);border-bottom:1px solid var(--border);}
+.result-bar-left{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:var(--text)}
+.sdot{width:8px;height:8px;border-radius:50%;background:var(--amber);transition:background .4s}
+.rtag{font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(127,119,221,0.15);border:1px solid rgba(127,119,221,0.25);color:var(--purple-light);}
+.loading-box{padding:3rem 1rem;text-align:center;background:var(--surface2)}
+.spin{width:36px;height:36px;border:2px solid var(--border2);border-top-color:var(--purple);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1rem;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-txt{font-size:14px;color:var(--text2);margin-bottom:.75rem}
+.load-steps{display:flex;justify-content:center;gap:5px}
+.lstep{width:7px;height:7px;border-radius:50%;background:var(--border2)}
+.lstep.pulse{background:var(--purple);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.output-box{padding:1.25rem}
+.art-frame{border-radius:var(--radius-sm);overflow:hidden;background:#f8f6ff;display:flex;align-items:center;justify-content:center;margin-bottom:1rem;min-height:180px;border:1px solid var(--border);}
+.art-frame svg{max-width:100%;height:auto;display:block}
+.desc-box{background:rgba(127,119,221,0.08);border:1px solid rgba(127,119,221,0.2);border-radius:var(--radius-sm);padding:1rem;margin-bottom:1rem;}
+.desc-box-label{font-size:11px;font-weight:600;color:var(--purple-light);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.desc-box p{font-size:13px;color:var(--text2);line-height:1.65}
+.actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.abtn{padding:10px 8px;font-size:13px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface2);color:var(--text);display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;}
+.abtn:hover{border-color:var(--border2);background:var(--surface)}
+.abtn.ok{background:rgba(29,158,117,0.12);border-color:rgba(29,158,117,0.3);color:#5DCAA5}
+
+/* HISTORY */
+.hist-section{margin-top:2rem}
+.hist-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem}
+.hist-top h2{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px;}
+.hist-clr{font-size:12px;color:var(--text3);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:4px 8px;border-radius:6px;transition:all .15s;}
+.hist-clr:hover{background:rgba(226,75,74,0.1);color:#F09595}
+.hist-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.hist-card{border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--border);cursor:pointer;background:var(--surface);transition:all .18s;}
+.hist-card:hover{border-color:var(--purple);transform:translateY(-2px)}
+.hist-thumb{aspect-ratio:4/3;background:#f8f6ff;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:6px;}
+.hist-thumb svg{max-width:100%;max-height:100%;display:block}
+.hist-meta{padding:7px 9px;border-top:1px solid var(--border)}
+.hist-name{font-size:11px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hist-time{font-size:10px;color:var(--text3);margin-top:1px}
+.empty-hist{grid-column:1/-1;text-align:center;padding:2.5rem 1rem;border:1px dashed var(--border2);border-radius:var(--radius);color:var(--text3);font-size:13px;}
+.empty-hist span{display:block;font-size:26px;margin-bottom:.5rem;opacity:.4}
+
+footer{text-align:center;margin-top:3rem;font-size:12px;color:var(--text3);}
+footer strong{color:var(--purple-light)}
+
+/* TOAST */
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(20px);background:var(--teal);color:#fff;padding:10px 20px;border-radius:30px;font-size:13px;font-weight:500;opacity:0;transition:all .3s;pointer-events:none;z-index:999;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:500px){
+  .tpl-grid{grid-template-columns:repeat(2,1fr)}
+  .hist-grid{grid-template-columns:repeat(2,1fr)}
+  .actions{grid-template-columns:1fr 1fr}
+  .actions .abtn:last-child{grid-column:1/-1}
+  .api-card{padding:2rem 1.25rem}
+}
+</style>
+</head>
+<body>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+
+<!-- ===== TELA DE API KEY ===== -->
+<div id="api-screen">
+  <div class="api-card">
+    <span class="api-logo">🎨</span>
+    <h2>Estúdio de Arte com IA</h2>
+    <p>Para começar, insira sua chave da API Anthropic. Ela é usada apenas para gerar suas artes e <strong>nunca é armazenada</strong>.</p>
+    <div class="api-input-wrap">
+      <input type="password" id="api-key-input" placeholder="sk-ant-api03-..." autocomplete="off"/>
+      <button class="eye-btn" onclick="toggleApiVis()" title="Mostrar/ocultar">👁</button>
+    </div>
+    <div class="api-error" id="api-error">❌ Chave inválida. Verifique e tente novamente.</div>
+    <button class="api-btn" onclick="entrarComKey()">✦ Entrar no Estúdio</button>
+    <div class="api-hint">
+      Não tem uma chave?
+      <a href="https://console.anthropic.com" target="_blank">Crie gratuitamente em console.anthropic.com</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===== APP PRINCIPAL ===== -->
+<div id="main-app">
+<div class="wrapper">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-logo">🎨</span>
+      <div>
+        <div class="topbar-title">Estúdio de Arte com IA</div>
+        <div class="topbar-sub">Powered by Claude AI</div>
+      </div>
+    </div>
+    <button class="key-badge" onclick="trocarKey()" title="Trocar API Key">🔑 <span id="key-preview">sk-ant-...</span> &nbsp;Trocar</button>
+  </div>
+
+  <header>
+    <div class="logo-badge"><span class="logo-dot"></span> IA Generativa</div>
+    <h1>Crie artes únicas<br>com Inteligência Artificial</h1>
+    <p>Descreva sua ideia e a IA transforma em arte profissional para empresas e pessoas</p>
+    <div class="header-pills">
+      <span class="pill pill-p">🏢 Empresas</span>
+      <span class="pill pill-c">👤 Pessoal</span>
+      <span class="pill pill-t">🎨 Arte livre</span>
+      <span class="pill pill-a">📁 Templates</span>
+      <span class="pill pill-k">💾 Histórico</span>
+    </div>
+  </header>
+
+  <!-- MODOS -->
+  <div class="mode-tabs">
+    <button class="mtab active" onclick="setMode('empresa',this)">
+      <span class="mtab-icon">🏢</span>
+      <span class="mtab-label">Empresa</span>
+      <span class="mtab-sub">Logo · Banner · Post</span>
+    </button>
+    <button class="mtab" onclick="setMode('pessoa',this)">
+      <span class="mtab-icon">👤</span>
+      <span class="mtab-label">Pessoal</span>
+      <span class="mtab-sub">Perfil · Portfólio</span>
+    </button>
+    <button class="mtab" onclick="setMode('livre',this)">
+      <span class="mtab-icon">✨</span>
+      <span class="mtab-label">Arte livre</span>
+      <span class="mtab-sub">Qualquer ideia</span>
+    </button>
+  </div>
+
+  <!-- EMPRESA -->
+  <div id="sec-empresa" class="sec active">
+    <div class="card">
+      <div class="tpl-title">⚡ Templates rápidos</div>
+      <div class="tpl-grid">
+        <div class="tpl-btn" onclick="applyE('tech')"><span class="tpl-icon">💻</span>Startup Tech</div>
+        <div class="tpl-btn" onclick="applyE('food')"><span class="tpl-icon">☕</span>Restaurante</div>
+        <div class="tpl-btn" onclick="applyE('saude')"><span class="tpl-icon">🏥</span>Saúde</div>
+        <div class="tpl-btn" onclick="applyE('moda')"><span class="tpl-icon">👗</span>Moda</div>
+        <div class="tpl-btn" onclick="applyE('edu')"><span class="tpl-icon">📚</span>Educação</div>
+        <div class="tpl-btn" onclick="applyE('fin')"><span class="tpl-icon">💰</span>Finanças</div>
+      </div>
+      <div class="fg"><div class="flabel">🏢 Nome da empresa</div><input type="text" id="e-nome" placeholder="Ex: Nova Tech, Café Aurora, Studio Bloom..."/></div>
+      <div class="row2">
+        <div class="fg"><div class="flabel">📂 Setor</div>
+          <select id="e-setor"><option>Tecnologia</option><option>Saúde</option><option>Educação</option><option>Alimentação</option><option>Moda</option><option>Finanças</option><option>Imóveis</option><option>Beleza</option><option>Esportes</option><option>Jurídico</option><option>Outro</option></select>
+        </div>
+        <div class="fg"><div class="flabel">🎨 Tipo de arte</div>
+          <select id="e-tipo"><option>Logo / Identidade visual</option><option>Banner redes sociais</option><option>Post Instagram</option><option>Cartão de visita</option><option>Capa de perfil</option></select>
+        </div>
+      </div>
+      <div class="fg"><div class="flabel">✏️ Estilo visual</div>
+        <div class="chips" id="e-estilos">
+          <span class="chip on" onclick="this.classList.toggle('on')">Moderno</span>
+          <span class="chip" onclick="this.classList.toggle('on')">Minimalista</span>
+          <span class="chip" onclick="this.classList.toggle('on')">Corporativo</span>
+          <span class="chip" onclick="this.classList.toggle('on')">Criativo</span>
+          <span class="chip" onclick="this.classList.toggle('on')">Elegante</span>
+          <span class="chip" onclick="this.classList.toggle('on')">Bold</span>
+          <span class="chip" onclick="this.classList.toggle('on')">Futurista</span>
+          <span class="chip" onclick="this.classList.toggle('on')">Orgânico</span>
+        </div>
+      </div>
+      <div class="fg"><div class="flabel">🎨 Cor principal</div>
+        <div class="cp-row" id="e-cores">
+          <div class="cp on" style="background:#7F77DD" data-n="roxo" onclick="pickC(this,'e-cores')"></div>
+          <div class="cp" style="background:#D85A30" data-n="coral" onclick="pickC(this,'e-cores')"></div>
+          <div class="cp" style="background:#1D9E75" data-n="verde" onclick="pickC(this,'e-cores')"></div>
+          <div class="cp" style="background:#378ADD" data-n="azul" onclick="pickC(this,'e-cores')"></div>
+          <div class="cp" style="background:#EF9F27" data-n="âmbar" onclick="pickC(this,'e-cores')"></div>
+          <div class="cp" style="background:#D4537E" data-n="rosa" onclick="pickC(this,'e-cores')"></div>
+          <div class="cp" style="background:#F0EDF8" data-n="branco" onclick="pickC(this,'e-cores')"></div>
+          <div class="cp" style="background:#2C2C2A;border:1px solid #555" data-n="preto" onclick="pickC(this,'e-cores')"></div>
+        </div>
+      </div>
+      <div class="fg"><div class="flabel">📝 Detalhes extras</div><textarea id="e-extra" placeholder="Slogan, público-alvo, valores da marca, inspirações..."></textarea></div>
+    </div>
+    <button class="btn-gen" onclick="gerar('empresa')">✦ Criar arte agora</button>
+  </div>
+
+  <!-- PESSOA -->
+  <div id="sec-pessoa" class="sec">
+    <div class="card">
+      <div class="tpl-title">⚡ Templates rápidos</div>
+      <div class="tpl-grid">
+        <div class="tpl-btn" onclick="applyP('musico')"><span class="tpl-icon">🎵</span>Músico</div>
+        <div class="tpl-btn" onclick="applyP('designer')"><span class="tpl-icon">🖌️</span>Designer</div>
+        <div class="tpl-btn" onclick="applyP('atleta')"><span class="tpl-icon">🏃</span>Atleta</div>
+        <div class="tpl-btn" onclick="applyP('chef')"><span class="tpl-icon">👨‍🍳</span>Chef</div>
+        <div class="tpl-btn" onclick="applyP('dev')"><span class="tpl-icon">💻</span>Dev</div>
+        <div class="tpl-btn" onclick="applyP('foto')"><span class="tpl-icon">📷</span>Fotógrafo</div>
+      </div>
+      <div class="fg"><div class="flabel">👤 Seu nome ou apelido</div><input type="text" id="p-nome" placeholder="Ex: Ana Lima, @anadraws, DJ Volt..."/></div>
+      <div class="row2">
+        <div class="fg"><div class="flabel">🎯 Finalidade</div>
+          <select id="p-tipo"><option>Foto de perfil artística</option><option>Capa de rede social</option><option>Cartão pessoal</option><option>Arte para portfólio</option><option>Presente personalizado</option></select>
+        </div>
+        <div class="fg"><div class="flabel">🖼️ Estilo</div>
+          <select id="p-estilo"><option>Ilustração digital</option><option>Aquarela</option><option>Flat design</option><option>Cartoon</option><option>Arte abstrata</option><option>Geométrico</option></select>
+        </div>
+      </div>
+      <div class="fg"><div class="flabel">❤️ Interesses e personalidade</div><textarea id="p-desc" placeholder="Ex: adoro gatos, viagens e café. Sou designer e toco violão nas horas vagas..."></textarea></div>
+    </div>
+    <button class="btn-gen" onclick="gerar('pessoa')">✦ Criar arte agora</button>
+  </div>
+
+  <!-- LIVRE -->
+  <div id="sec-livre" class="sec">
+    <div class="card">
+      <div class="tpl-title">✨ Inspirações rápidas</div>
+      <div class="tpl-grid">
+        <div class="tpl-btn" onclick="applyL('cosmo')"><span class="tpl-icon">🌌</span>Cosmos</div>
+        <div class="tpl-btn" onclick="applyL('floresta')"><span class="tpl-icon">🌳</span>Floresta</div>
+        <div class="tpl-btn" onclick="applyL('geo')"><span class="tpl-icon">🔷</span>Geométrico</div>
+        <div class="tpl-btn" onclick="applyL('oceano')"><span class="tpl-icon">🌊</span>Oceano</div>
+        <div class="tpl-btn" onclick="applyL('neon')"><span class="tpl-icon">⚡</span>Neon urbano</div>
+        <div class="tpl-btn" onclick="applyL('mandala')"><span class="tpl-icon">🔮</span>Mandala</div>
+      </div>
+      <div class="fg"><div class="flabel">💡 Sua ideia criativa</div><textarea id="l-desc" style="height:90px" placeholder="Ex: uma raposa astronauta olhando para a terra, estilo aquarela, tons quentes e vibrantes..."></textarea></div>
+      <div class="fg"><div class="flabel">🔍 Abordagem</div>
+        <div class="chips">
+          <span class="chip on" id="ref-orig" onclick="setRef('original',this)">Criação original</span>
+          <span class="chip" id="ref-web" onclick="setRef('web',this)">Inspiração web</span>
+          <span class="chip" id="ref-both" onclick="setRef('ambos',this)">Híbrido</span>
+        </div>
+      </div>
+    </div>
+    <button class="btn-gen" onclick="gerar('livre')">✦ Criar arte agora</button>
+  </div>
+
+  <!-- RESULTADO -->
+  <div id="result-wrap" class="result-wrap" style="display:none">
+    <div class="result-bar">
+      <div class="result-bar-left"><span class="sdot" id="sdot"></span> Arte gerada pela IA</div>
+      <span class="rtag" id="rtag">Original</span>
+    </div>
+    <div id="result-inner">
+      <div class="loading-box" id="loading-box">
+        <div class="spin"></div>
+        <div class="load-txt" id="lmsg">A IA está criando sua arte...</div>
+        <div class="load-steps">
+          <div class="lstep pulse" id="ls0"></div><div class="lstep" id="ls1"></div>
+          <div class="lstep" id="ls2"></div><div class="lstep" id="ls3"></div>
+        </div>
+      </div>
+      <div class="output-box" id="output-box" style="display:none">
+        <div class="art-frame" id="art-frame"></div>
+        <div class="desc-box">
+          <div class="desc-box-label">✦ Sobre esta arte</div>
+          <p id="art-desc">...</p>
+        </div>
+        <div class="actions">
+          <button class="abtn" onclick="regenerar()">🔄 Nova versão</button>
+          <button class="abtn" id="copybtn" onclick="copiarSVG()">📋 Copiar SVG</button>
+          <button class="abtn" onclick="exportSVG()">⬇️ Baixar SVG</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTÓRICO -->
+  <div class="hist-section">
+    <div class="hist-top">
+      <h2>🕐 Histórico de artes</h2>
+      <button class="hist-clr" onclick="limparHist()">🗑️ Limpar</button>
+    </div>
+    <div class="hist-grid" id="hist-grid">
+      <div class="empty-hist"><span>🎨</span>Suas artes aparecerão aqui</div>
+    </div>
+  </div>
+
+  <footer><p>✦ <strong>Estúdio de Arte com IA</strong> &nbsp;·&nbsp; Powered by Claude AI</p></footer>
+
+</div><!-- wrapper -->
+</div><!-- main-app -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+let mode='empresa', refMode='original', lastSvg='', stepTimer, stepIdx=0, hist=[];
+let API_KEY='';
+
+// ===== API KEY =====
+function toggleApiVis(){
+  const inp=document.getElementById('api-key-input');
+  inp.type=inp.type==='password'?'text':'password';
+}
+
+function entrarComKey(){
+  const key=document.getElementById('api-key-input').value.trim();
+  if(!key||!key.startsWith('sk-')){
+    document.getElementById('api-error').style.display='block';
+    return;
+  }
+  API_KEY=key;
+  document.getElementById('api-error').style.display='none';
+  document.getElementById('api-screen').style.display='none';
+  document.getElementById('main-app').style.display='block';
+  const preview=key.slice(0,14)+'...';
+  document.getElementById('key-preview').textContent=preview;
+  sessionStorage.setItem('arte_key',key);
+}
+
+function trocarKey(){
+  API_KEY='';
+  sessionStorage.removeItem('arte_key');
+  document.getElementById('api-key-input').value='';
+  document.getElementById('api-screen').style.display='flex';
+  document.getElementById('main-app').style.display='none';
+}
+
+// Restaurar chave da sessão
+window.addEventListener('load',()=>{
+  const saved=sessionStorage.getItem('arte_key');
+  if(saved&&saved.startsWith('sk-')){
+    API_KEY=saved;
+    document.getElementById('api-screen').style.display='none';
+    document.getElementById('main-app').style.display='block';
+    document.getElementById('key-preview').textContent=saved.slice(0,14)+'...';
+  }
+  renderHist();
+});
+
+document.getElementById('api-key-input').addEventListener('keydown',e=>{
+  if(e.key==='Enter')entrarComKey();
+});
+
+// ===== TEMPLATES =====
+const tplsE={
+  tech:{nome:'NovaTech',setor:'Tecnologia',tipo:'Logo / Identidade visual',estilos:['Moderno','Futurista'],cor:'azul',extra:'Startup de IA inovadora para o futuro'},
+  food:{nome:'Café Aurora',setor:'Alimentação',tipo:'Logo / Identidade visual',estilos:['Orgânico','Elegante'],cor:'âmbar',extra:'Café artesanal aconchegante e sofisticado'},
+  saude:{nome:'VitaClinic',setor:'Saúde',tipo:'Logo / Identidade visual',estilos:['Moderno','Minimalista'],cor:'verde',extra:'Clínica moderna e humanizada'},
+  moda:{nome:'Voga Studio',setor:'Moda',tipo:'Capa de perfil',estilos:['Elegante','Bold'],cor:'rosa',extra:'Moda contemporânea e sustentável'},
+  edu:{nome:'LearnUp',setor:'Educação',tipo:'Banner redes sociais',estilos:['Criativo','Moderno'],cor:'roxo',extra:'Plataforma de ensino online interativo'},
+  fin:{nome:'WealthGrow',setor:'Finanças',tipo:'Logo / Identidade visual',estilos:['Corporativo','Elegante'],cor:'preto',extra:'Gestão de investimentos premium'}
+};
+const tplsP={
+  musico:{nome:'DJ Volt',tipo:'Capa de rede social',estilo:'Arte abstrata',desc:'músico eletrônico, amo beats e energia urbana, shows noturnos'},
+  designer:{nome:'Ana Designs',tipo:'Foto de perfil artística',estilo:'Flat design',desc:'designer gráfica, minimalista, tipografia e cores vibrantes'},
+  atleta:{nome:'Rodrigo Run',tipo:'Cartão pessoal',estilo:'Geométrico',desc:'corredor de maratona, disciplina, velocidade e superação'},
+  chef:{nome:'Chef Lia',tipo:'Capa de rede social',estilo:'Ilustração digital',desc:'chef de cozinha italiana, paixão por sabores e aromas'},
+  dev:{nome:'CodeMaster',tipo:'Foto de perfil artística',estilo:'Geométrico',desc:'desenvolvedor fullstack, fã de terminal e café forte'},
+  foto:{nome:'Lens & Soul',tipo:'Capa de rede social',estilo:'Arte abstrata',desc:'fotógrafo de natureza, luz natural e momentos únicos'}
+};
+const tplsL={
+  cosmo:'Um cosmos vibrante com nebulosas coloridas, planetas geométricos e estrelas cintilantes, estilo sci-fi artístico',
+  floresta:'Uma floresta encantada com árvores luminosas, cogumelos mágicos e raios de luz entre as folhas, estilo fantasia',
+  geo:'Composição geométrica abstrata com hexágonos, triângulos e círculos em tons de roxo, coral e teal, estilo moderno',
+  oceano:'Oceano profundo com ondas estilizadas, criaturas marinhas bioluminescentes e coral colorido, estilo aquarela',
+  neon:'Cidade futurista à noite com arranha-céus, luzes neon refletidas na chuva e silhuetas urbanas, estilo cyberpunk',
+  mandala:'Mandala intrincada com padrões simétricos florais e geométricos em tons dourados e violeta, estilo decorativo'
+};
+
+function applyE(k){
+  const t=tplsE[k];
+  document.getElementById('e-nome').value=t.nome;
+  document.getElementById('e-setor').value=t.setor;
+  document.getElementById('e-tipo').value=t.tipo;
+  document.getElementById('e-extra').value=t.extra;
+  document.querySelectorAll('#e-estilos .chip').forEach(c=>c.classList.toggle('on',t.estilos.includes(c.textContent.trim())));
+  document.querySelectorAll('#e-cores .cp').forEach(c=>c.classList.toggle('on',c.dataset.n===t.cor));
+}
+function applyP(k){const t=tplsP[k];document.getElementById('p-nome').value=t.nome;document.getElementById('p-tipo').value=t.tipo;document.getElementById('p-estilo').value=t.estilo;document.getElementById('p-desc').value=t.desc;}
+function applyL(k){document.getElementById('l-desc').value=tplsL[k];}
+
+// ===== UI =====
+function setMode(m,el){
+  mode=m;
+  document.querySelectorAll('.mtab').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.getElementById('sec-'+m).classList.add('active');
+}
+function setRef(r,el){
+  refMode=r;
+  document.getElementById('ref-orig').classList.toggle('on',r==='original');
+  document.getElementById('ref-web').classList.toggle('on',r==='web');
+  document.getElementById('ref-both').classList.toggle('on',r==='ambos');
+}
+function pickC(el,grp){
+  document.querySelectorAll('#'+grp+' .cp').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+}
+function getChips(id){return Array.from(document.querySelectorAll('#'+id+' .chip.on')).map(c=>c.textContent.trim()).join(', ');}
+
+// ===== PROMPT =====
+function buildPrompt(){
+  if(mode==='empresa'){
+    const nome=document.getElementById('e-nome').value||'Minha Empresa';
+    const setor=document.getElementById('e-setor').value;
+    const tipo=document.getElementById('e-tipo').value;
+    const estilos=getChips('e-estilos')||'moderno';
+    const cor=document.querySelector('#e-cores .cp.on')?.dataset.n||'roxo';
+    const extra=document.getElementById('e-extra').value;
+    return `Crie um SVG profissional e visualmente impactante de 500x300px para a empresa "${nome}" do setor ${setor}. Tipo: ${tipo}. Estilo: ${estilos}. Cor principal: ${cor}. ${extra?'Detalhes: '+extra+'.':''} Use formas geométricas criativas, tipografia limpa com o nome da empresa, ícone representativo. Paleta harmoniosa e profissional. Retorne APENAS o código SVG completo.`;
+  }
+  if(mode==='pessoa'){
+    const nome=document.getElementById('p-nome').value||'Artista';
+    const tipo=document.getElementById('p-tipo').value;
+    const estilo=document.getElementById('p-estilo').value;
+    const desc=document.getElementById('p-desc').value;
+    return `Crie um SVG artístico de 400x400px para "${nome}". Tipo: ${tipo}. Estilo: ${estilo}. ${desc?'Sobre: '+desc:''} Composição criativa, tipografia expressiva, elementos que reflitam a personalidade. Retorne APENAS o SVG completo.`;
+  }
+  const desc=document.getElementById('l-desc').value||'arte abstrata vibrante';
+  const extra=refMode==='web'?' Inspire-se em estilos do Behance e Dribbble.':refMode==='ambos'?' Combine referências modernas com criatividade própria.':'';
+  return `Crie um SVG artístico de 500x340px sobre: "${desc}".${extra} Composição expressiva, cores vibrantes, formas dinâmicas. Retorne APENAS o SVG completo.`;
+}
+
+function startLoader(){
+  stepIdx=0;
+  const msgs=['A IA está criando sua arte...','Compondo formas e cores...','Refinando cada detalhe...','Finalizando a obra...'];
+  document.getElementById('lmsg').textContent=msgs[0];
+  clearInterval(stepTimer);
+  stepTimer=setInterval(()=>{
+    [0,1,2,3].forEach(i=>document.getElementById('ls'+i).classList.toggle('pulse',i===stepIdx%4));
+    stepIdx++;
+    document.getElementById('lmsg').textContent=msgs[stepIdx%msgs.length];
+  },1700);
+}
+
+function getNome(){
+  if(mode==='empresa')return document.getElementById('e-nome').value||'Empresa';
+  if(mode==='pessoa')return document.getElementById('p-nome').value||'Pessoal';
+  return (document.getElementById('l-desc').value||'Arte livre').slice(0,22);
+}
+
+// ===== GERAR =====
+async function gerar(m){
+  mode=m;
+  if(!API_KEY){showToast('❌ Insira sua API Key primeiro!');return;}
+  document.getElementById('result-wrap').style.display='block';
+  document.getElementById('loading-box').style.display='block';
+  document.getElementById('output-box').style.display='none';
+  document.getElementById('sdot').style.background='#EF9F27';
+  document.getElementById('rtag').textContent=refMode==='web'?'Com referências':refMode==='ambos'?'Híbrido':'Original';
+  startLoader();
+  document.getElementById('result-wrap').scrollIntoView({behavior:'smooth',block:'start'});
+
+  const prompt=buildPrompt()+'\n\nDepois do SVG, escreva "===DESC===" e então 2 frases em português descrevendo as escolhas criativas da arte.';
+
+  try{
+    const res=await fetch('/api/generate',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':API_KEY},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,messages:[{role:'user',content:prompt}]})
+    });
+    const data=await res.json();
+    clearInterval(stepTimer);
+
+    if(data.error){
+      document.getElementById('lmsg').textContent='❌ '+( data.error.message||'Erro na API');
+      document.getElementById('sdot').style.background='#E24B4A';
+      if(data.error.type==='authentication_error')showToast('❌ Chave inválida. Verifique sua API Key.');
+      return;
+    }
+
+    const full=data.content.map(b=>b.text||'').join('');
+    const parts=full.split('===DESC===');
+    let raw=parts[0].trim();
+    const desc=parts[1]?parts[1].trim():'Arte criada com sucesso!';
+    const match=raw.match(/<svg[\s\S]*<\/svg>/i);
+    if(match)raw=match[0];
+    lastSvg=raw;
+
+    const frame=document.getElementById('art-frame');
+    frame.innerHTML=raw;
+    const svgEl=frame.querySelector('svg');
+    if(svgEl){svgEl.style.maxWidth='100%';svgEl.style.height='auto';}
+    document.getElementById('art-desc').textContent=desc;
+    document.getElementById('sdot').style.background='#1D9E75';
+    document.getElementById('loading-box').style.display='none';
+    document.getElementById('output-box').style.display='block';
+    addHist(raw,getNome());
+
+  }catch(e){
+    clearInterval(stepTimer);
+    document.getElementById('lmsg').textContent='❌ Erro de conexão. Tente novamente.';
+    document.getElementById('sdot').style.background='#E24B4A';
+    console.error(e);
+  }
+}
+
+function regenerar(){gerar(mode);}
+
+// ===== HISTÓRICO =====
+function addHist(svg,nome){
+  const now=new Date();
+  const time=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+  hist.unshift({svg,nome,time});
+  if(hist.length>9)hist.pop();
+  renderHist();
+}
+function renderHist(){
+  const g=document.getElementById('hist-grid');
+  if(!hist.length){g.innerHTML='<div class="empty-hist"><span>🎨</span>Suas artes aparecerão aqui</div>';return;}
+  g.innerHTML=hist.map((h,i)=>`
+    <div class="hist-card" onclick="loadHist(${i})">
+      <div class="hist-thumb">${h.svg}</div>
+      <div class="hist-meta"><div class="hist-name">${h.nome}</div><div class="hist-time">⏱ ${h.time}</div></div>
+    </div>`).join('');
+  document.querySelectorAll('.hist-thumb svg').forEach(s=>{s.style.maxWidth='100%';s.style.height='auto';});
+}
+function loadHist(i){
+  const h=hist[i];lastSvg=h.svg;
+  document.getElementById('result-wrap').style.display='block';
+  document.getElementById('loading-box').style.display='none';
+  document.getElementById('output-box').style.display='block';
+  const frame=document.getElementById('art-frame');
+  frame.innerHTML=h.svg;
+  const svg=frame.querySelector('svg');
+  if(svg){svg.style.maxWidth='100%';svg.style.height='auto';}
+  document.getElementById('art-desc').textContent='Arte carregada do histórico. Clique em "Nova versão" para regenerar.';
+  document.getElementById('sdot').style.background='#1D9E75';
+  document.getElementById('result-wrap').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function limparHist(){hist=[];renderHist();}
+
+// ===== AÇÕES =====
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+async function copiarSVG(){
+  if(!lastSvg)return;
+  try{
+    await navigator.clipboard.writeText(lastSvg);
+    const btn=document.getElementById('copybtn');
+    btn.classList.add('ok');btn.textContent='✓ Copiado!';
+    setTimeout(()=>{btn.classList.remove('ok');btn.textContent='📋 Copiar SVG';},2000);
+    showToast('✓ SVG copiado!');
+  }catch(e){console.error(e);}
+}
+function exportSVG(){
+  if(!lastSvg)return;
+  const blob=new Blob([lastSvg],{type:'image/svg+xml'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='arte-ia.svg';a.click();
+  URL.revokeObjectURL(url);
+  showToast('⬇️ Download iniciado!');
+}
+</script>
+</body>
+</html>
